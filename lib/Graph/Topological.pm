@@ -41,4 +41,39 @@ sub faces
     return map { [ sort $_->members ] } @{$self->get_graph_attribute( 'faces' )};
 }
 
+sub truncate
+{
+    my( $self, @vertices ) = @_;
+    @vertices = $self->vertices unless @vertices;
+
+    for my $vertex (@vertices) {
+        # Cut all the edges
+        for my $neighbour ($self->neighbours( $vertex )) {
+            $self->add_edge( $neighbour, $vertex . $neighbour ); # TODO: Ensure such vertex does not exist
+        }
+
+        # Trim all the faces
+        for my $face_id (0..scalar( $self->faces ) - 1) {
+            my $face = $self->get_graph_attribute( 'faces' )->[$face_id];
+            next unless $face->has( $vertex );
+
+            # Find the two neighbours of $vertex in the face
+            my( $v1, $v2 ) = grep { $face->has( $_ ) } $self->neighbours( $vertex );
+
+            # Connect the new vertices corresponding to edges with these neighbours
+            $self->add_edge( $vertex . $v1, $vertex . $v2 );
+
+            # Adjust the face
+            $face->invert( $vertex, $vertex . $v1, $vertex . $v2 );
+        }
+
+        # Add new face created by trimming this one
+        push @{$self->get_graph_attribute( 'faces' )},
+             Set::Scalar->new( map { $vertex . $_ } $self->neighbours( $vertex ) );
+
+        # Remove the vertex
+        $self->delete_vertex( $vertex );
+    }
+}
+
 1;
