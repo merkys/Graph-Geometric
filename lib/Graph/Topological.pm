@@ -7,14 +7,6 @@ use parent 'Graph::Undirected';
 
 use Set::Scalar;
 
-sub regular_dodecahedron
-{
-    my( $class ) = @_;
-    my $pt = $class->pentagonal_trapezohedron;
-    $pt->truncate( 'A', 'B' );
-    return $pt;
-}
-
 sub pentagonal_trapezohedron
 {
     my( $class ) = @_;
@@ -41,6 +33,20 @@ sub pentagonal_trapezohedron
 
     $self->set_graph_attribute( 'faces', \@faces );
     return bless $self, $class;
+}
+
+sub regular_dodecahedron
+{
+    my( $class ) = @_;
+    my $pt = $class->pentagonal_trapezohedron;
+    $pt->truncate( 'A', 'B' );
+    return $pt;
+}
+
+sub regular_icosahedron
+{
+    my( $class ) = @_;
+    return $class->regular_dodecahedron->dual;
 }
 
 sub faces
@@ -97,7 +103,7 @@ sub dual
         my $face1 = $self->get_graph_attribute( 'faces' )->[$face1_id];
 
         my $edges = {};
-        for ($self->subgraph( $face1->members )->edges) {
+        for ($self->subgraph( [$face1->members] )->edges) {
             my @edges = sort @$_;
             $edges->{$edges[0]}{$edges[1]} = 1;
         }
@@ -106,7 +112,7 @@ sub dual
             my $face2 = $self->get_graph_attribute( 'faces' )->[$face2_id];
 
             # If faces share an edge, they are connected in the dual
-            for ($self->subgraph( $face2->members )->edges) {
+            for ($self->subgraph( [$face2->members] )->edges) {
                 my @edges = sort @$_;
                 next unless $edges->{$edges[0]}{$edges[1]};
 
