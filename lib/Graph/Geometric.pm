@@ -11,13 +11,7 @@ sub antiprism
 {
     my( $class, $N ) = @_;
 
-    my $n_letters = int( log( $N * 2 ) / log( 27 ) ) + 1;
-    my $name = 'A' x $n_letters;
-    my @vertices;
-    for (1..($N*2)) {
-        push @vertices, $name;
-        $name++;
-    }
+    my @vertices = _names( $N * 2 );
 
     # Cap faces
     my @F1 = map { $vertices[$_] } grep { !($_ % 2) } 0..($N*2-1);
@@ -54,13 +48,7 @@ sub cucurbituril
     my( $class, $N ) = @_;
     $N = 5 unless defined $N;
 
-    my $n_letters = int( log( $N * 10 ) / log( 27 ) ) + 1;
-    my $name = 'A' x $n_letters;
-    my @vertices;
-    for (1..($N*10)) {
-        push @vertices, $name;
-        $name++;
-    }
+    my @vertices = _names( $N * 10 );
 
     my $self = Graph::Undirected->new;
     $self->add_vertices( @vertices );
@@ -109,25 +97,20 @@ sub pyramid
 {
     my( $class, $N ) = @_;
 
-    my $n_letters = int( log( $N + 1 ) / log( 27 ) ) + 1;
-    my $name = 'A' x $n_letters;
-    my @vertices;
-    for (1..($N+1)) {
-        push @vertices, $name;
-        $name++;
-    }
+    my @vertices = _names( $N + 1 );
+    my( $apex, @base ) = @vertices;
 
     my $self = Graph::Undirected->new;
     my @faces;
     $self->add_vertices( @vertices );
-    $self->add_cycle( @vertices[1..-1] );
-    push @faces, Set::Scalar->new( @vertices[1..-1] );
+    $self->add_cycle( @base );
+    push @faces, Set::Scalar->new( @base );
 
-    for (1..$N) {
-        $self->add_edge( $vertices[0], $vertices[$_] );
-        push @faces, Set::Scalar->new( $vertices[0],
-                                       $vertices[$_],
-                                       $vertices[($_+1) % ($N+1)] );
+    for (0..($N-1)) {
+        $self->add_edge( $apex, $base[$_] );
+        push @faces, Set::Scalar->new( $apex,
+                                       $base[$_],
+                                       $base[($_+1) % $N] );
     }
 
     $self->set_graph_attribute( 'faces', \@faces );
@@ -175,13 +158,7 @@ sub trapezohedron
 {
     my( $class, $N ) = @_;
 
-    my $n_letters = int( log( $N * 2 + 2 ) / log( 27 ) ) + 1;
-    my $name = 'A' x $n_letters;
-    my @vertices;
-    for (1..($N * 2 + 2)) {
-        push @vertices, $name;
-        $name++;
-    }
+    my @vertices = _names( $N * 2 + 2 );
 
     my $self = Graph::Undirected->new;
     $self->add_vertices( @vertices );
@@ -374,6 +351,21 @@ sub dual
     $dual->set_graph_attribute( 'faces', \@dual_faces );
 
     return bless $dual; # TODO: Bless with a class
+}
+
+sub _names
+{
+    my( $N ) = @_;
+
+    my $n_letters = int( log( $N ) / log( 27 ) ) + 1;
+    my $name = 'A' x $n_letters;
+    my @names;
+    for (1..$N) {
+        push @names, $name;
+        $name++;
+    }
+
+    return @names;
 }
 
 1;
