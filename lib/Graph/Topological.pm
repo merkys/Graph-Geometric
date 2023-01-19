@@ -7,6 +7,14 @@ use parent 'Graph::Undirected';
 
 use Set::Scalar;
 
+sub regular_dodecahedron
+{
+    my( $class ) = @_;
+    my $pt = $class->pentagonal_trapezohedron;
+    $pt->truncate( 'A', 'B' );
+    return $pt;
+}
+
 sub pentagonal_trapezohedron
 {
     my( $class ) = @_;
@@ -74,6 +82,44 @@ sub truncate
         # Remove the vertex
         $self->delete_vertex( $vertex );
     }
+}
+
+sub dual
+{
+    my( $self ) = @_;
+
+    my $dual = Graph::Undirected->new;
+
+    # All faces become vertices
+    $dual->add_vertices( map { join '', @$_ } $self->faces );
+
+    for my $face1_id (0..scalar( $self->faces ) - 1) {
+        my $face1 = $self->get_graph_attribute( 'faces' )->[$face1_id];
+
+        my $edges = {};
+        for ($self->subgraph( $face1->members )->edges) {
+            my @edges = sort @$_;
+            $edges->{$edges[0]}{$edges[1]} = 1;
+        }
+
+        for my $face2_id ($face1_id+1..scalar( $self->faces ) - 1) {
+            my $face2 = $self->get_graph_attribute( 'faces' )->[$face2_id];
+
+            # If faces share an edge, they are connected in the dual
+            for ($self->subgraph( $face2->members )->edges) {
+                my @edges = sort @$_;
+                next unless $edges->{$edges[0]}{$edges[1]};
+
+                $dual->add_edge( join( '', sort $face1->members ),
+                                 join( '', sort $face2->members ) );
+                last;
+            }
+        }
+    }
+
+    # TODO: Find cycles
+
+    return bless $dual; # TODO: Bless with a class
 }
 
 1;
