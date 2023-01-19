@@ -40,6 +40,15 @@ sub antiprism
     return bless $self, $class;
 }
 
+sub bipyramid
+{
+    my( $class, $N ) = @_;
+    my $pyramid = $class->pyramid( $N );
+    my( $base ) = $pyramid->faces;
+    $pyramid->stellate( $base );
+    return $pyramid;
+}
+
 sub cucurbituril
 {
     my( $class, $N ) = @_;
