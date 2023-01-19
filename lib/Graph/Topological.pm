@@ -119,6 +119,34 @@ sub faces
     return map { [ sort $_->members ] } @{$self->get_graph_attribute( 'faces' )};
 }
 
+# Deletes a face by replacing it with a single new vertex.
+# FIXME: Assumes such face exists.
+sub delete_face
+{
+    my( $self, $face ) = @_;
+
+    my $vertex = join '', sort @$face;
+    $self->add_vertex( $vertex );
+
+    for my $member (@$face) {
+        for my $neighbour ($self->neighbours( $member )) {
+            $self->add_edge( $neighbour, $vertex );
+        }
+    }
+
+    my $face_set = Set::Scalar( @$face );
+    my @faces = grep { !$face_set->is_equal( $_ ) }
+                     @{$self->get_graph_attribute( 'faces' )};
+    for (@faces) {
+        next if $face_set->is_disjoint( $_ );
+        $_->delete( @$face );
+        $_->insert( $vertex );
+    }
+
+    $self->set_graph_attribute( 'faces', \@faces );
+    return $self;
+}
+
 # Handles vertex deletion by merging containing faces
 sub delete_vertex
 {
