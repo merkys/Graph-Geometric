@@ -249,18 +249,25 @@ sub delete_vertex
 
 sub stellate
 {
-    my( $self ) = @_;
+    my( $self, @faces ) = @_;
+    @faces = $self->faces unless @faces;
 
     my @faces_now;
     for my $face ($self->faces) {
-        my $center = join '', @$face;
-        $self->add_vertex( $center );
-        for my $vertex (@$face) {
-            $self->add_edge( $center, $vertex );
-        }
+        if( grep { join( '', sort @$face ) eq join( '', sort @$_ ) } @faces ) {
+            # This face has been requested to be stellated
+            my $center = join '', @$face;
+            $self->add_vertex( $center );
+            for my $vertex (@$face) {
+                $self->add_edge( $center, $vertex );
+            }
 
-        for my $edge ($self->subgraph( $face )->edges) {
-            push @faces_now, Set::Scalar->new( $center, @$edge );
+            for my $edge ($self->subgraph( $face )->edges) {
+                push @faces_now, Set::Scalar->new( $center, @$edge );
+            }
+        } else {
+            # This face has not been requested to be stellated
+            push @faces_now, Set::Scalar->new( @$face );
         }
     }
 
