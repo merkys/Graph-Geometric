@@ -123,7 +123,15 @@ sub dual
         }
     }
 
-    # TODO: Find cycles
+    my @dual_faces;
+    for my $vertex ($self->vertices) {
+        my @faces = grep { $_->has( $vertex ) }
+                         @{$self->get_graph_attribute( 'faces' )};
+        push @dual_faces,
+             Set::Scalar->new( map { join '', sort $_->members } @faces );
+    }
+
+    $dual->set_graph_attribute( 'faces', \@dual_faces );
 
     return bless $dual; # TODO: Bless with a class
 }
