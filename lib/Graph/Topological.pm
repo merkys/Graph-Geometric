@@ -119,6 +119,25 @@ sub faces
     return map { [ sort $_->members ] } @{$self->get_graph_attribute( 'faces' )};
 }
 
+# Handles vertex deletion by merging containing faces
+sub delete_vertex
+{
+    my( $self, $vertex ) = @_;
+    $self->SUPER::delete_vertex( $vertex );
+
+    my @containing_faces = grep {  $_->has( $vertex ) }
+                                @{$self->get_graph_attribute( 'faces' )};
+    my @other_faces      = grep { !$_->has( $vertex ) }
+                                @{$self->get_graph_attribute( 'faces' )};
+
+    my $new_face = sum( @containing_faces );
+    $new_face->delete( $vertex );
+
+    $self->set_graph_attribute( 'faces', [ @other_faces, $new_face ] );
+
+    return $self;
+}
+
 sub stellate
 {
     my( $self ) = @_;
@@ -170,7 +189,7 @@ sub truncate
              Set::Scalar->new( map { $vertex . $_ } $self->neighbours( $vertex ) );
 
         # Remove the vertex
-        $self->delete_vertex( $vertex );
+        $self->SUPER::delete_vertex( $vertex );
     }
 }
 
