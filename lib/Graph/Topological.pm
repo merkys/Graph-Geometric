@@ -63,6 +63,26 @@ sub faces
     return map { [ sort $_->members ] } @{$self->get_graph_attribute( 'faces' )};
 }
 
+sub stellate
+{
+    my( $self ) = @_;
+
+    my @faces_now;
+    for my $face ($self->faces) {
+        my $center = join '', @$face;
+        $self->add_vertex( $center );
+        for my $vertex (@$face) {
+            $self->add_edge( $center, $vertex );
+        }
+
+        for my $edge ($self->subgraph( $face )->edges) {
+            push @faces_now, Set::Scalar->new( $center, @$edge );
+        }
+    }
+
+    $self->set_graph_attribute( 'faces', \@faces_now );
+}
+
 sub truncate
 {
     my( $self, @vertices ) = @_;
