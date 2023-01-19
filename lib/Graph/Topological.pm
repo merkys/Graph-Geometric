@@ -49,6 +49,29 @@ sub regular_icosahedron
     return $class->regular_dodecahedron->dual;
 }
 
+sub tetrahedron
+{
+    my( $class ) = @_;
+
+    my @vertices = 'A'..'D';
+
+    my $self = Graph::Undirected->new;
+    $self->add_vertices( @vertices );
+
+    my @faces;
+    for my $v1 (@vertices) {
+        for my $v2 (@vertices) {
+            next if $v1 eq $v2;
+            $self->add_edge( $v1, $v2 );
+        }
+
+        push @faces, Set::Scalar->new( grep { $_ ne $v1 } @vertices );
+    }
+
+    $self->set_graph_attribute( 'faces', \@faces );
+    return bless $self, $class;
+}
+
 sub truncated_icosahedron
 {
     my( $class ) = @_;
