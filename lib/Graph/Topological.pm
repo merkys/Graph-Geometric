@@ -49,6 +49,14 @@ sub regular_icosahedron
     return $class->regular_dodecahedron->dual;
 }
 
+sub truncated_icosahedron
+{
+    my( $class ) = @_;
+    my $rt = $class->regular_icosahedron;
+    $rt->truncate;
+    return $rt;
+}
+
 sub faces
 {
     my( $self ) = @_;
