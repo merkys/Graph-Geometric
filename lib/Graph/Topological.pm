@@ -7,6 +7,39 @@ use parent 'Graph::Undirected';
 
 use Set::Scalar;
 
+sub antiprism
+{
+    my( $class, $N ) = @_;
+
+    my $n_letters = int( log( $N * 2 ) / log( 27 ) ) + 1;
+    my $name = 'A' x $n_letters;
+    my @vertices;
+    for (1..($N*2)) {
+        push @vertices, $name;
+        $name++;
+    }
+
+    # Cap faces
+    my @F1 = map { $vertices[$_] } grep { !($_ % 2) } 0..($N*2-1);
+    my @F2 = map { $vertices[$_] } grep {   $_ % 2  } 0..($N*2-1);
+
+    my $self = Graph::Undirected->new;
+    $self->add_vertices( @vertices );
+
+    $self->add_cycle( @F1 );
+    $self->add_cycle( @F2 );
+    $self->add_cycle( @vertices );
+
+    my @faces = ( Set::Scalar->new( @F1 ), Set::Scalar->new( @F2 ) );
+    for my $i (0..($N-1)) {
+        push @faces, Set::Scalar->new( map { $vertices[($i*2+$_) % ($N*2)] } 0..2 );
+        push @faces, Set::Scalar->new( map { $vertices[($i*2+$_) % ($N*2)] } 1..3 );
+    }
+
+    $self->set_graph_attribute( 'faces', \@faces );
+    return bless $self, $class;
+}
+
 sub pentagonal_trapezohedron
 {
     my( $class ) = @_;
