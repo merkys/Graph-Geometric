@@ -43,6 +43,7 @@ sub antiprism
 sub cucurbituril
 {
     my( $class, $N ) = @_;
+    $N = 5 unless defined $N;
 
     my $n_letters = int( log( $N * 10 ) / log( 27 ) ) + 1;
     my $name = 'A' x $n_letters;
