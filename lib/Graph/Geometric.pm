@@ -118,6 +118,35 @@ sub pentagonal_trapezohedron
     return bless $self, $class;
 }
 
+sub pyramid
+{
+    my( $class, $N ) = @_;
+
+    my $n_letters = int( log( $N + 1 ) / log( 27 ) ) + 1;
+    my $name = 'A' x $n_letters;
+    my @vertices;
+    for (1..($N+1)) {
+        push @vertices, $name;
+        $name++;
+    }
+
+    my $self = Graph::Undirected->new;
+    my @faces;
+    $self->add_vertices( @vertices );
+    $self->add_cycle( @vertices[1..-1] );
+    push @faces, Set::Scalar->new( @vertices[1..-1] );
+
+    for (1..$N) {
+        $self->add_edge( $vertices[0], $vertices[$_] );
+        push @faces, Set::Scalar->new( $vertices[0],
+                                       $vertices[$_],
+                                       $vertices[($_+1) % ($N+1)] );
+    }
+
+    $self->set_graph_attribute( 'faces', \@faces );
+    return bless $self, $class;
+}
+
 sub regular_dodecahedron
 {
     my( $class ) = @_;
