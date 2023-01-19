@@ -40,6 +40,55 @@ sub antiprism
     return bless $self, $class;
 }
 
+sub cucurbituril
+{
+    my( $class, $N ) = @_;
+
+    my $n_letters = int( log( $N * 10 ) / log( 27 ) ) + 1;
+    my $name = 'A' x $n_letters;
+    my @vertices;
+    for (1..($N*10)) {
+        push @vertices, $name;
+        $name++;
+    }
+
+    my $self = Graph::Undirected->new;
+    $self->add_vertices( @vertices );
+
+    # Cap faces
+    my( @CAP1, @CAP2 );
+
+    my @faces;
+
+    # For each of the clycouril units
+    for (0..($N-1)) {
+        my @F51 = ( @vertices[($_*10)   .. ($_*10+4)] );
+        my @F52 = ( @vertices[($_*10+4) .. ($_*10+7)], $vertices[$_*10] );
+        my @F8  = ( @vertices[($_*10+3) .. ($_*10+5)],
+                    $vertices[$_*10+9],
+                    $vertices[(($_+1)*10+7) % $N * 10],
+                    $vertices[(($_+1)*10)   % $N * 10],
+                    $vertices[(($_+1)*10+1) % $N * 10],
+                    $vertices[$_*10+8] );
+        $self->add_cycle( @F51 );
+        $self->add_cycle( @F52 );
+        $self->add_cycle( @F8 );
+        push @faces, Set::Scalar->new( @F51 ),
+                     Set::Scalar->new( @F52 ),
+                     Set::Scalar->new( @F8 );
+
+        push @CAP1, @vertices[($_*10+1)..($_*10+3)], $vertices[$_*10+8];
+        push @CAP2, $vertices[$_*10+9], @vertices[($_*10+5)..($_*10+7)];
+    }
+
+    @faces = ( Set::Scalar->new( @CAP1 ),
+               Set::Scalar->new( @CAP2 ),
+               @faces );
+
+    $self->set_graph_attribute( 'faces', \@faces );
+    return bless $self, $class;
+}
+
 sub pentagonal_trapezohedron
 {
     my( $class ) = @_;
