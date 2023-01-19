@@ -1,4 +1,4 @@
-package Graph::Topological;
+package Graph::Geometric;
 
 use strict;
 use warnings;
