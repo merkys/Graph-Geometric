@@ -66,9 +66,9 @@ sub cucurbituril
         my @F52 = ( @vertices[($_*10+4) .. ($_*10+7)], $vertices[$_*10] );
         my @F8  = ( @vertices[($_*10+3) .. ($_*10+5)],
                     $vertices[$_*10+9],
-                    $vertices[(($_+1)*10+7) % $N * 10],
-                    $vertices[(($_+1)*10)   % $N * 10],
-                    $vertices[(($_+1)*10+1) % $N * 10],
+                    $vertices[(($_+1)*10+7) % ($N * 10)],
+                    $vertices[(($_+1)*10)   % ($N * 10)],
+                    $vertices[(($_+1)*10+1) % ($N * 10)],
                     $vertices[$_*10+8] );
         $self->add_cycle( @F51 );
         $self->add_cycle( @F52 );
