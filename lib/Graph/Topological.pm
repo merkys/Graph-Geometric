@@ -134,6 +134,8 @@ sub delete_face
         }
     }
 
+    $self->SUPER::delete_vertices( @$face );
+
     my $face_set = Set::Scalar( @$face );
     my @faces = grep { !$face_set->is_equal( $_ ) }
                      @{$self->get_graph_attribute( 'faces' )};
