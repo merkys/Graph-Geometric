@@ -102,29 +102,7 @@ sub cucurbituril
 sub pentagonal_trapezohedron
 {
     my( $class ) = @_;
-
-    my $self = Graph::Undirected->new;
-    $self->add_vertices( 'A', 'B' ); # the axial vertices
-    my @equatorial_vertices = ( 'C'..'L' );
-
-    $self->add_vertices( @equatorial_vertices );
-    for (0..$#equatorial_vertices) {
-        $self->add_edge( $equatorial_vertices[$_],
-                         ($_ % 2 ? 'B' : 'A') );
-        $self->add_edge( $equatorial_vertices[$_],
-                         $equatorial_vertices[($_+1) % 10] );
-    }
-
-    my @faces;
-    for my $i (0..4) {
-        push @faces, Set::Scalar->new( 'A',
-                                       map { $equatorial_vertices[($i*2+$_) % 10] } 0..2 );
-        push @faces, Set::Scalar->new( 'B',
-                                       map { $equatorial_vertices[($i*2+$_) % 10] } 1..3 );
-    }
-
-    $self->set_graph_attribute( 'faces', \@faces );
-    return bless $self, $class;
+    return $class->trapezohedron( 5 );
 }
 
 sub pyramid
@@ -187,6 +165,40 @@ sub tetrahedron
         }
 
         push @faces, Set::Scalar->new( grep { $_ ne $v1 } @vertices );
+    }
+
+    $self->set_graph_attribute( 'faces', \@faces );
+    return bless $self, $class;
+}
+
+sub trapezohedron
+{
+    my( $class, $N ) = @_;
+
+    my $n_letters = int( log( $N * 2 + 2 ) / log( 27 ) ) + 1;
+    my $name = 'A' x $n_letters;
+    my @vertices;
+    for (1..($N * 2 + 2)) {
+        push @vertices, $name;
+        $name++;
+    }
+
+    my $self = Graph::Undirected->new;
+    $self->add_vertices( @vertices );
+    my( $apex1, $apex2, @equator ) = @vertices;
+    $self->add_cycle( @equator );
+
+    for (0..$#equator) {
+        $self->add_edge( $equator[$_],
+                         (($_+1) % 2 ? $apex1 : $apex2) );
+    }
+
+    my @faces;
+    for my $i (0..$N-1) {
+        push @faces, Set::Scalar->new( $apex1,
+                                       map { $equator[($i*2+$_) % ($N*2)] } 0..2 );
+        push @faces, Set::Scalar->new( $apex2,
+                                       map { $equator[($i*2+$_) % ($N*2)] } 1..3 );
     }
 
     $self->set_graph_attribute( 'faces', \@faces );
