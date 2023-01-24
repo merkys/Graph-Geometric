@@ -10,6 +10,14 @@ use parent 'Graph::Undirected';
 
 use Set::Scalar;
 
+=head1 CONSTRUCTORS
+
+=method C<antiprism>
+
+Given N, creates an N-gonal antiprism.
+
+=cut
+
 sub antiprism
 {
     my( $class, $N ) = @_;
@@ -37,6 +45,12 @@ sub antiprism
     return bless $self, $class;
 }
 
+=method C<bipyramid>
+
+Given N, creates an N-gonal bipyramid.
+
+=cut
+
 sub bipyramid
 {
     my( $class, $N ) = @_;
@@ -45,6 +59,13 @@ sub bipyramid
     $pyramid->stellate( $base );
     return $pyramid;
 }
+
+=method C<cucurbituril>
+
+Given N, creates a geometric graph representing chemical structure of cucurbit[N]uril.
+Cucurbiturils do not exacly fit the definition of polyhedra, but have nevertheless interesting structures.
+
+=cut
 
 sub cucurbituril
 {
@@ -90,11 +111,24 @@ sub cucurbituril
     return bless $self, $class;
 }
 
+=method C<pentagonal_trapezohedron>
+
+Creates a pentagonal trapezohedron.
+This method may be removed later on in favour of more general C<trapezohedron> method.
+
+=cut
+
 sub pentagonal_trapezohedron
 {
     my( $class ) = @_;
     return $class->trapezohedron( 5 );
 }
+
+=method C<prism>
+
+Given N, creates an N-gonal prism.
+
+=cut
 
 sub prism
 {
@@ -121,6 +155,12 @@ sub prism
     return bless $self, $class;
 }
 
+=method C<pyramid>
+
+Given N, creates an N-gonal pyramid.
+
+=cut
+
 sub pyramid
 {
     my( $class, $N ) = @_;
@@ -145,6 +185,13 @@ sub pyramid
     return bless $self, $class;
 }
 
+=method C<regular_dodecahedron>
+
+Creates a regular dodecahedron.
+Word "regular" may in future disappear from method's name.
+
+=cut
+
 sub regular_dodecahedron
 {
     my( $class ) = @_;
@@ -153,11 +200,24 @@ sub regular_dodecahedron
     return $pt;
 }
 
+=method C<regular_icosahedron>
+
+Creates a regular icosahedron.
+Word "regular" may in future disappear from method's name.
+
+=cut
+
 sub regular_icosahedron
 {
     my( $class ) = @_;
     return $class->regular_dodecahedron->dual;
 }
+
+=method C<tetrahedron>
+
+Creates a regular tetrahedron.
+
+=cut
 
 sub tetrahedron
 {
@@ -181,6 +241,12 @@ sub tetrahedron
     $self->set_graph_attribute( 'faces', \@faces );
     return bless $self, $class;
 }
+
+=method C<trapezohedron>
+
+Creates an N-gonal trapezohedron.
+
+=cut
 
 sub trapezohedron
 {
@@ -210,6 +276,12 @@ sub trapezohedron
     return bless $self, $class;
 }
 
+=method C<truncated_icosahedron>
+
+Creates a truncated icosahedron.
+
+=cut
+
 sub truncated_icosahedron
 {
     my( $class ) = @_;
@@ -218,11 +290,28 @@ sub truncated_icosahedron
     return $rt;
 }
 
+=head1 ACCESSORS
+
+=method C<faces>
+
+Returns an array of arrays listing vertices in each of polyhedron's faces.
+Vertex lists are returned sorted, they do not maintain the order of vertices in faces.
+
+=cut
+
 sub faces
 {
     my( $self ) = @_;
     return map { [ sort $_->members ] } @{$self->get_graph_attribute( 'faces' )};
 }
+
+=head1 GRAPH METHODS
+
+=method C<deep_copy>
+
+Creates a deep copy of a Graph::Geometric object.
+
+=cut
 
 sub deep_copy
 {
@@ -231,8 +320,15 @@ sub deep_copy
     return bless $copy; # FIXME: Bless with the same class
 }
 
-# Deletes a face by replacing it with a single new vertex.
-# FIXME: Assumes such face exists.
+=method C<delete_face>
+
+Deletes a given face from polyhedra.
+A face is defined by an unordered list of vertices.
+Given face is assumed to exist, a check will be implemented later.
+Modifies and returns the original object.
+
+=cut
+
 sub delete_face
 {
     my( $self, $face ) = @_;
@@ -261,7 +357,13 @@ sub delete_face
     return $self;
 }
 
-# Handles vertex deletion by merging containing faces
+=method C<delete_vertex>
+
+Handles vertex deletion by merging neighbouring faces.
+Modifies and returns the original object.
+
+=cut
+
 sub delete_vertex
 {
     my( $self, $vertex ) = @_;
@@ -279,6 +381,16 @@ sub delete_vertex
 
     return $self;
 }
+
+=head1 GEOMETRIC METHODS
+
+=method C<stellate>
+
+Given a polyhedron and a list of faces, performs stellation of specified faces.
+If no faces are given, all faces are stellated.
+Modifies and returns the original object.
+
+=cut
 
 sub stellate
 {
@@ -306,6 +418,14 @@ sub stellate
 
     $self->set_graph_attribute( 'faces', \@faces_now );
 }
+
+=method C<truncate>
+
+Given a polyhedron and a list of vertices, performs truncation of specified vertices.
+If no vertices are given, all vertices are stellated.
+Modifies and returns the original object.
+
+=cut
 
 sub truncate
 {
@@ -343,6 +463,13 @@ sub truncate
 
     return $self;
 }
+
+=method C<dual>
+
+Given a polyhedron, returns its dual as a new object.
+The original object is not modified.
+
+=cut
 
 sub dual
 {
@@ -389,6 +516,12 @@ sub dual
 
     return bless $dual; # TODO: Bless with a class
 }
+
+=method C<truncated>
+
+Copies the given polyhedron, truncates all its vertices and returns the truncated polyhedron.
+
+=cut
 
 sub truncated($)
 {
