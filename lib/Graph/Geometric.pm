@@ -221,6 +221,13 @@ sub faces
     return map { [ sort $_->members ] } @{$self->get_graph_attribute( 'faces' )};
 }
 
+sub deep_copy
+{
+    my( $self ) = @_;
+    my $copy = $self->SUPER::deep_copy;
+    return bless $copy; # FIXME: Bless with the same class
+}
+
 # Deletes a face by replacing it with a single new vertex.
 # FIXME: Assumes such face exists.
 sub delete_face
@@ -330,6 +337,8 @@ sub truncate
         # Remove the vertex
         $self->SUPER::delete_vertex( $vertex );
     }
+
+    return $self;
 }
 
 sub dual
@@ -376,6 +385,11 @@ sub dual
     $dual->set_graph_attribute( 'faces', \@dual_faces );
 
     return bless $dual; # TODO: Bless with a class
+}
+
+sub truncated($)
+{
+    return $_[0]->deep_copy->truncate;
 }
 
 sub _names

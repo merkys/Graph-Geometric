@@ -4,12 +4,17 @@ use strict;
 use warnings;
 
 use Graph::Geometric;
-use Test::More tests => 4;
+use Test::More;
 
-my $g = Graph::Geometric->truncated_icosahedron;
+my @cases = ( Graph::Geometric->truncated_icosahedron,
+              Graph::Geometric->regular_icosahedron->truncated );
 
-is scalar( $g->vertices ), 60;
-is scalar( $g->edges ), 90;
-is scalar( $g->faces ), 32;
+plan tests => 4 * scalar @cases;
 
-is join( ',', sort map { scalar @$_ } $g->faces ), '5,5,5,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6';
+for (@cases) {
+    is scalar( $_->vertices ), 60;
+    is scalar( $_->edges ), 90;
+    is scalar( $_->faces ), 32;
+
+    is join( ',', sort map { scalar @$_ } $_->faces ), '5,5,5,5,5,5,5,5,5,5,5,5,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6,6';
+}
