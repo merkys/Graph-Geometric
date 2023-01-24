@@ -3,6 +3,9 @@ package Graph::Geometric;
 use strict;
 use warnings;
 
+# ABSTRACT: Create and work with geometric graphs
+# VERSION
+
 use parent 'Graph::Undirected';
 
 use Set::Scalar;
