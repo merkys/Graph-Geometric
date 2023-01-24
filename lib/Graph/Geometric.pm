@@ -93,6 +93,31 @@ sub pentagonal_trapezohedron
     return $class->trapezohedron( 5 );
 }
 
+sub prism
+{
+    my( $class, $N ) = @_;
+
+    my @vertices = _names( $N * 2 );
+    my @F1 = @vertices[0..($N-1)];
+    my @F2 = @vertices[$N..$#vertices];
+
+    my $self = Graph::Undirected->new;
+    my @faces;
+    $self->add_cycle( @F1 );
+    $self->add_cycle( @F2 );
+    push @faces, Set::Scalar->new( @F1 ), Set::Scalar->new( @F2 );
+
+    for (0..($N-1)) {
+        $self->add_edge( $F1[$_], $F2[$_] );
+        push @faces, Set::Scalar->new( $F1[$_], $F2[$_],
+                                       $F1[($_+1) % ($N*2)],
+                                       $F2[($_+1) % ($N*2)] );
+    }
+
+    $self->set_graph_attribute( 'faces', \@faces );
+    return bless $self, $class;
+}
+
 sub pyramid
 {
     my( $class, $N ) = @_;
