@@ -10,6 +10,25 @@ use parent 'Graph::Undirected';
 
 use Set::Scalar;
 
+=head1 SYNOPSIS
+
+    use Graph::Geometric;
+
+    # Generate a truncated regular icosahedron
+    my $g = Graph::Geometric->regular_icosahedron->truncated;
+
+    # Count the faces
+    print scalar $g->faces;
+
+=head1 DESCRIPTION
+
+C<Graph::Geometric> is an extension of C<Graph> to support working with geometric (topologic) graphs.
+In addition to vertices and edges, C<Graph::Geometric> has a concept of faces to ease handling of geometric graphs.
+
+As of now, C<Graph::Geometric> does not allow for arbitrary graph construction.
+Geometric graphs have to be built from simple polyhedra (constructors listed below) or derived from them by using modifiers such as stellation or truncation.
+Removal of vertices and faces is also supported.
+
 =head1 CONSTRUCTORS
 
 =method C<antiprism>
