@@ -24,10 +24,17 @@ use Set::Scalar;
 
 C<Graph::Geometric> is an extension of C<Graph> to support working with geometric (topologic) graphs.
 In addition to vertices and edges, C<Graph::Geometric> has a concept of faces to ease handling of geometric graphs.
+C<Graph::Geometric> does not provide coordinates for vertices as it is supposed to be used for topology analysis of geometric shapes.
 
 As of now, C<Graph::Geometric> does not allow for arbitrary graph construction.
 Geometric graphs have to be built from simple polyhedra (constructors listed below) or derived from them by using modifiers such as stellation or truncation.
 Removal of vertices and faces is also supported.
+
+=head2 ON THE STABILITY OF API
+
+As C<Graph::Geometric> is in its early stages of development, not much of API stability can be promised.
+In particular, method names are likely to be changed for the sake of homogeneity.
+Names of generated vertices and order of faces returned by C<faces()> as well are likely to change.
 
 =head1 CONSTRUCTORS
 
