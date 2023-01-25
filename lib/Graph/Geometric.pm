@@ -2,11 +2,20 @@ package Graph::Geometric;
 
 use strict;
 use warnings;
+use feature qw(current_sub);
 
 # ABSTRACT: Create and work with geometric graphs
 # VERSION
 
-use parent 'Graph::Undirected';
+use parent 'Graph::Undirected', 'Exporter';
+our @EXPORT = qw(
+    pentagonal
+    pentagonal_trapezohedron
+    regular_icosahedron
+    trapezohedron
+    truncated
+    truncated_icosahedron
+);
 
 use Set::Scalar;
 
@@ -35,6 +44,7 @@ Removal of vertices and faces is also supported.
 As C<Graph::Geometric> is in its early stages of development, not much of API stability can be promised.
 In particular, method names are likely to be changed for the sake of homogeneity.
 Names of generated vertices and order of faces returned by C<faces()> as well are likely to change.
+Some syntax sugar may also appear.
 
 =head1 CONSTRUCTORS
 
@@ -47,6 +57,7 @@ Given N, creates an N-gonal antiprism.
 sub antiprism
 {
     my( $class, $N ) = @_;
+    return __SUB__ unless defined $N;
 
     my @vertices = _names( $N * 2 );
 
@@ -80,6 +91,8 @@ Given N, creates an N-gonal bipyramid.
 sub bipyramid
 {
     my( $class, $N ) = @_;
+    return __SUB__ unless defined $N;
+
     my $pyramid = $class->pyramid( $N );
     my( $base ) = $pyramid->faces;
     $pyramid->stellate( $base );
@@ -156,10 +169,9 @@ This method may be removed later on in favour of more general C<trapezohedron> m
 
 =cut
 
-sub pentagonal_trapezohedron
+sub pentagonal_trapezohedron()
 {
-    my( $class ) = @_;
-    return $class->trapezohedron( 5 );
+    return trapezohedron( 5 );
 }
 
 =method C<prism>
@@ -171,6 +183,7 @@ Given N, creates an N-gonal prism.
 sub prism
 {
     my( $class, $N ) = @_;
+    return __SUB__ unless defined $N;
 
     my @vertices = _names( $N * 2 );
     my @F1 = @vertices[0..($N-1)];
@@ -202,6 +215,7 @@ Given N, creates an N-gonal pyramid.
 sub pyramid
 {
     my( $class, $N ) = @_;
+    return __SUB__ unless defined $N;
 
     my @vertices = _names( $N + 1 );
     my( $apex, @base ) = @vertices;
@@ -230,10 +244,9 @@ Word "regular" may in future disappear from method's name.
 
 =cut
 
-sub regular_dodecahedron
+sub regular_dodecahedron()
 {
-    my( $class ) = @_;
-    my $pt = $class->pentagonal_trapezohedron;
+    my $pt = pentagonal_trapezohedron;
     $pt->truncate( 'A', 'B' );
     return $pt;
 }
@@ -245,10 +258,9 @@ Word "regular" may in future disappear from method's name.
 
 =cut
 
-sub regular_icosahedron
+sub regular_icosahedron()
 {
-    my( $class ) = @_;
-    return $class->regular_dodecahedron->dual;
+    return regular_dodecahedron->dual;
 }
 
 =method C<tetrahedron>
@@ -257,10 +269,8 @@ Creates a regular tetrahedron.
 
 =cut
 
-sub tetrahedron
+sub tetrahedron()
 {
-    my( $class ) = @_;
-
     my @vertices = 'A'..'D';
 
     my $self = Graph::Undirected->new;
@@ -277,7 +287,7 @@ sub tetrahedron
     }
 
     $self->set_graph_attribute( 'faces', \@faces );
-    return bless $self, $class;
+    return bless $self; # TODO: Bless with class?
 }
 
 =method C<trapezohedron>
@@ -288,7 +298,8 @@ Creates an N-gonal trapezohedron.
 
 sub trapezohedron
 {
-    my( $class, $N ) = @_;
+    my( $N ) = @_;
+    return __SUB__ unless defined $N;
 
     my @vertices = _names( $N * 2 + 2 );
 
@@ -311,7 +322,7 @@ sub trapezohedron
     }
 
     $self->set_graph_attribute( 'faces', \@faces );
-    return bless $self, $class;
+    return bless $self; # TODO: Bless with class?
 }
 
 =method C<truncated_icosahedron>
@@ -320,12 +331,9 @@ Creates a truncated icosahedron.
 
 =cut
 
-sub truncated_icosahedron
+sub truncated_icosahedron()
 {
-    my( $class ) = @_;
-    my $rt = $class->regular_icosahedron;
-    $rt->truncate;
-    return $rt;
+    return regular_icosahedron->truncate;
 }
 
 =head1 ACCESSORS
@@ -564,6 +572,11 @@ Copies the given polyhedron, truncates all its vertices and returns the truncate
 sub truncated($)
 {
     return $_[0]->deep_copy->truncate;
+}
+
+sub pentagonal($)
+{
+    $_[0]->(5);
 }
 
 sub _names

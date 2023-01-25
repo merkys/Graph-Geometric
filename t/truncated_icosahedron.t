@@ -6,8 +6,8 @@ use warnings;
 use Graph::Geometric;
 use Test::More;
 
-my @cases = ( Graph::Geometric->truncated_icosahedron,
-              Graph::Geometric->regular_icosahedron->truncated );
+my @cases = ( truncated_icosahedron,
+              truncated regular_icosahedron );
 
 plan tests => 4 * scalar @cases;
 

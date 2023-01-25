@@ -4,10 +4,15 @@ use strict;
 use warnings;
 
 use Graph::Geometric;
-use Test::More tests => 3;
+use Test::More;
 
-my $g = Graph::Geometric->pentagonal_trapezohedron;
+my @cases = ( pentagonal_trapezohedron,
+              pentagonal trapezohedron );
 
-is scalar( $g->vertices ), 12;
-is scalar( $g->edges ),    20;
-is scalar( $g->faces ),    10;
+plan tests => 3 * scalar @cases;
+
+for (@cases) {
+    is scalar( $_->vertices ), 12;
+    is scalar( $_->edges ),    20;
+    is scalar( $_->faces ),    10;
+}
