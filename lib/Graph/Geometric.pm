@@ -8,12 +8,19 @@ use feature qw(current_sub);
 # VERSION
 
 use parent 'Graph::Undirected', 'Exporter';
-our @EXPORT = qw(
+
+our @polygon_names = (
+    '', 'mono', 'di', 'tri', 'tetra', 'penta', 'hexa', 'hepta', 'octa', 'nona', 'deca',
+    'undeca', 'dodeca', 'trideca', 'tetradeca', 'pentadeca', 'hexadeca', 'heptadeca', 'octadeca', 'nonadeca',
+    'icosa', 'henicosa', 'docosa', 'tricosa', 'tetracosa', 'pentacosa', 'hexacosa', 'heptacosa', 'octacosa', 'nonacosa',
+    'triaconta', 'hentriaconta', 'dotriaconta', 'tritriaconta', 'tetratriaconta', 'pentatriaconta', 'hexatriaconta', 'heptatriaconta',
+    'octatriaconta', 'nonatriaconta', 'tetraconta',
+);
+my @subs = qw(
     antiprism
     bipyramid
     cucurbituril
     octahedron
-    pentagonal
     pentagonal_trapezohedron
     prism
     regular_icosahedron
@@ -22,6 +29,9 @@ our @EXPORT = qw(
     truncated
     truncated_icosahedron
 );
+push @subs, map { $_ . 'gonal' } @polygon_names[1..$#polygon_names];
+
+our @EXPORT = @subs;
 
 use Set::Scalar;
 
@@ -626,15 +636,8 @@ sub _names
 sub _polygon_name_to_number
 {
     my( $name ) = @_;
-
-    my @numbers = ( '?', 'mono', 'di', 'tri', 'tetra', 'penta', 'hexa', 'hepta', 'octa', 'nona', 'deca',
-                    'undeca', 'dodeca', 'trideca', 'tetradeca', 'pentadeca', 'hexadeca', 'heptadeca', 'octadeca', 'nonadeca',
-                    'icosa', 'henicosa', 'docosa', 'tricosa', 'tetracosa', 'pentacosa', 'hexacosa', 'heptacosa', 'octacosa', 'nonacosa',
-                    'triaconta', 'hentriaconta', 'dotriaconta', 'tritriaconta', 'tetratriaconta', 'pentatriaconta', 'hexatriaconta', 'heptatriaconta',
-                    'octatriaconta', 'nonatriaconta', 'tetraconta' );
-
     $name =~ s/gon(al)?$//;
-    my( $number ) = grep { $name eq $numbers[$_] } 0..$#numbers;
+    my( $number ) = grep { $name eq $polygon_names[$_] } 0..$#polygon_names;
     return $number;
 }
 
