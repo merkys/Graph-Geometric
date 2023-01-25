@@ -130,6 +130,18 @@ sub cucurbituril
     return bless $self, $class;
 }
 
+=method C<octahedron>
+
+Creates a regular octahedron.
+
+=cut
+
+sub octahedron
+{
+    my( $class ) = @_;
+    return $class->bipyramid( 4 );
+}
+
 =method C<pentagonal_trapezohedron>
 
 Creates a pentagonal trapezohedron.
