@@ -617,8 +617,20 @@ sub _names
 }
 
 # TODO: Implement according to https://en.wikipedia.org/wiki/Polygon#Naming
+# Not all synonyms are supported yet.
 sub _polygon_name_to_number
 {
+    my( $name ) = @_;
+
+    my @numbers = ( '?', 'mono', 'di', 'tri', 'tetra', 'penta', 'hexa', 'hepta', 'octa', 'nona', 'deca',
+                    'undeca', 'dodeca', 'trideca', 'tetradeca', 'pentadeca', 'hexadeca', 'heptadeca', 'octadeca', 'nonadeca',
+                    'icosa', 'henicosa', 'docosa', 'tricosa', 'tetracosa', 'pentacosa', 'hexacosa', 'heptacosa', 'octacosa', 'nonacosa',
+                    'triaconta', 'hentriaconta', 'dotriaconta', 'tritriaconta', 'tetratriaconta', 'pentatriaconta', 'hexatriaconta', 'heptatriaconta',
+                    'octatriaconta', 'nonatriaconta', 'tetraconta' );
+
+    $name =~ s/gon(al)?$//;
+    my( $number ) = grep { $name eq $numbers[$_] } 0..$#numbers;
+    return $number;
 }
 
 1;
