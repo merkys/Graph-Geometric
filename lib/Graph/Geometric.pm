@@ -616,4 +616,9 @@ sub _names
     return @names;
 }
 
+# TODO: Implement according to https://en.wikipedia.org/wiki/Polygon#Naming
+sub _polygon_name_to_number
+{
+}
+
 1;
