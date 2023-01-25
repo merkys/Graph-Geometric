@@ -12,6 +12,7 @@ our @EXPORT = qw(
     pentagonal
     pentagonal_trapezohedron
     regular_icosahedron
+    stellated
     trapezohedron
     truncated
     truncated_icosahedron
@@ -561,6 +562,17 @@ sub dual
     $dual->set_graph_attribute( 'faces', \@dual_faces );
 
     return bless $dual; # TODO: Bless with a class
+}
+
+=method C<stellated>
+
+Copies the given polyhedron, stellates all its faces and returns the stellated polyhedron.
+
+=cut
+
+sub stellated($)
+{
+    return $_[0]->deep_copy->stellate;
 }
 
 =method C<truncated>
