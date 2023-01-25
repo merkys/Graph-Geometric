@@ -9,8 +9,13 @@ use feature qw(current_sub);
 
 use parent 'Graph::Undirected', 'Exporter';
 our @EXPORT = qw(
+    antiprism
+    bipyramid
+    cucurbituril
+    octahedron
     pentagonal
     pentagonal_trapezohedron
+    prism
     regular_icosahedron
     stellated
     trapezohedron
@@ -52,12 +57,13 @@ Some syntax sugar may also appear.
 =method C<antiprism>
 
 Given N, creates an N-gonal antiprism.
+If N is not given, returns a code reference to itself.
 
 =cut
 
 sub antiprism
 {
-    my( $class, $N ) = @_;
+    my( $N ) = @_;
     return __SUB__ unless defined $N;
 
     my @vertices = _names( $N * 2 );
@@ -80,21 +86,22 @@ sub antiprism
     }
 
     $self->set_graph_attribute( 'faces', \@faces );
-    return bless $self, $class;
+    return bless $self;
 }
 
 =method C<bipyramid>
 
 Given N, creates an N-gonal bipyramid.
+If N is not given, returns a code reference to itself.
 
 =cut
 
 sub bipyramid
 {
-    my( $class, $N ) = @_;
+    my( $N ) = @_;
     return __SUB__ unless defined $N;
 
-    my $pyramid = $class->pyramid( $N );
+    my $pyramid = pyramid( $N );
     my( $base ) = $pyramid->faces;
     $pyramid->stellate( $base );
     return $pyramid;
@@ -104,12 +111,13 @@ sub bipyramid
 
 Given N, creates a geometric graph representing chemical structure of cucurbit[N]uril.
 Cucurbiturils do not exacly fit the definition of polyhedra, but have nevertheless interesting structures.
+If N is not given, returns a cucurbit[5]uril, the smallest naturally occurring cucurbituril.
 
 =cut
 
 sub cucurbituril
 {
-    my( $class, $N ) = @_;
+    my( $N ) = @_;
     $N = 5 unless defined $N;
 
     my @vertices = _names( $N * 10 );
@@ -148,7 +156,7 @@ sub cucurbituril
                @faces );
 
     $self->set_graph_attribute( 'faces', \@faces );
-    return bless $self, $class;
+    return bless $self;
 }
 
 =method C<octahedron>
@@ -157,10 +165,9 @@ Creates a regular octahedron.
 
 =cut
 
-sub octahedron
+sub octahedron()
 {
-    my( $class ) = @_;
-    return $class->bipyramid( 4 );
+    return bipyramid( 4 );
 }
 
 =method C<pentagonal_trapezohedron>
@@ -178,12 +185,13 @@ sub pentagonal_trapezohedron()
 =method C<prism>
 
 Given N, creates an N-gonal prism.
+If N is not given, returns a code reference to itself.
 
 =cut
 
 sub prism
 {
-    my( $class, $N ) = @_;
+    my( $N ) = @_;
     return __SUB__ unless defined $N;
 
     my @vertices = _names( $N * 2 );
@@ -204,18 +212,19 @@ sub prism
     }
 
     $self->set_graph_attribute( 'faces', \@faces );
-    return bless $self, $class;
+    return bless $self;
 }
 
 =method C<pyramid>
 
 Given N, creates an N-gonal pyramid.
+If N is not given, returns a code reference to itself.
 
 =cut
 
 sub pyramid
 {
-    my( $class, $N ) = @_;
+    my( $N ) = @_;
     return __SUB__ unless defined $N;
 
     my @vertices = _names( $N + 1 );
@@ -235,7 +244,7 @@ sub pyramid
     }
 
     $self->set_graph_attribute( 'faces', \@faces );
-    return bless $self, $class;
+    return bless $self;
 }
 
 =method C<regular_dodecahedron>
@@ -294,6 +303,7 @@ sub tetrahedron()
 =method C<trapezohedron>
 
 Creates an N-gonal trapezohedron.
+If N is not given, returns a code reference to itself.
 
 =cut
 
