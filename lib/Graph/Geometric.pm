@@ -24,7 +24,7 @@ use Set::Scalar;
     use Graph::Geometric;
 
     # Generate a truncated regular icosahedron
-    my $g = Graph::Geometric->regular_icosahedron->truncated;
+    my $g = regular_icosahedron->truncated;
 
     # Count the faces
     print scalar $g->faces;
