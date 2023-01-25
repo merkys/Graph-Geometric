@@ -23,6 +23,7 @@ my @subs = qw(
     octahedron
     pentagonal_trapezohedron
     prism
+    pyramid
     regular_icosahedron
     stellated
     trapezohedron
