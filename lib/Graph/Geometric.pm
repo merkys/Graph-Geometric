@@ -25,6 +25,16 @@ our @EXPORT = qw(
 
 use Set::Scalar;
 
+sub AUTOLOAD {
+    our $AUTOLOAD;
+    my $call = $AUTOLOAD;
+    $call =~ s/.*:://;
+    return if $call eq 'DESTROY' || $call !~ /gonal$/;
+    my $N = _polygon_name_to_number( $call );
+    return unless defined $N;
+    $_[0]->($N);
+}
+
 =head1 SYNOPSIS
 
     use Graph::Geometric;
@@ -594,11 +604,6 @@ Copies the given polyhedron, truncates all its vertices and returns the truncate
 sub truncated($)
 {
     return $_[0]->deep_copy->truncate;
-}
-
-sub pentagonal($)
-{
-    $_[0]->(5);
 }
 
 sub _names
