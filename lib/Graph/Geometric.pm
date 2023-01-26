@@ -26,6 +26,7 @@ my @subs = qw(
     prism
     pyramid
     regular_icosahedron
+    rotunda
     stellated
     trapezohedron
     truncated
@@ -35,6 +36,7 @@ push @subs, map { $_ . 'gonal' } @polygon_names[1..$#polygon_names];
 
 our @EXPORT = @subs;
 
+use List::Util qw( sum );
 use Set::Scalar;
 
 sub AUTOLOAD {
@@ -316,6 +318,24 @@ sub regular_icosahedron()
     return regular_dodecahedron->dual;
 }
 
+sub rotunda
+{
+    my( $N ) = @_;
+    return __SUB__ unless defined $N;
+
+    my $cupola = cupola( $N );
+    my $face;
+    for ($cupola->faces) {
+        next unless scalar( @$_ ) == $N;
+        next unless sum( map { $cupola->degree($_) } @$_ ) == $N*4;
+        $face = $_;
+        last;
+    }
+    $cupola->face_dualify( @$face );
+
+    return $cupola;
+}
+
 =method C<tetrahedron>
 
 Creates a regular tetrahedron.
@@ -524,6 +544,53 @@ sub delete_vertex
 }
 
 =head1 GEOMETRIC METHODS
+
+=cut
+
+sub carve_edge
+{
+    my( $self, @edge ) = @_;
+
+    $self->SUPER::delete_edge( @edge );
+    my $vertex = join '', sort @edge;
+
+    # Add new vertex in between the given ones
+    $self->add_path( $edge[0], $vertex, $edge[1] );
+
+    # Update all faces containing the edge to also have the new vertex
+    for (@{$self->get_graph_attribute( 'faces' )}) {
+        next unless $_->has( $edge[0] ) && $_->has( $edge[1] );
+        $_->insert( $vertex );
+    }
+
+    return $self;
+}
+
+sub face_dualify
+{
+    my( $self, @face ) = @_;
+
+    # Remove the to-be-dualified face
+    my @faces;
+    for my $face (@{$self->get_graph_attribute( 'faces' )}) {
+        next if join( '', sort $face->members ) eq join( '', sort @face );
+        push @faces, $face;
+    }
+
+    @face = _face_in_order( $self, @face );
+    my @new_vertices;
+    for (0..$#face) {
+        my @edge = sort ( $face[$_], $face[($_+1) % scalar @face] );
+        $self->carve_edge( @edge );
+        my $vertex = join '', @edge;
+        push @new_vertices, join '', @edge;
+        push @faces, Set::Scalar->new( $vertex, @edge );
+    }
+    $self->add_cycle( @new_vertices );
+    push @faces, Set::Scalar->new( @new_vertices );
+
+    $self->set_graph_attribute( 'faces', \@faces );
+}
 
 =method C<stellate>
 
