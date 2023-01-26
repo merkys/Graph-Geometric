@@ -20,6 +20,7 @@ my @subs = qw(
     antiprism
     bipyramid
     cucurbituril
+    cupola
     octahedron
     pentagonal_trapezohedron
     prism
@@ -180,6 +181,27 @@ sub cucurbituril
     return bless $self;
 }
 
+=method C<cupola>
+
+Given N, creates an N-gonal cupola.
+If N is not given, returns a code reference to itself.
+
+=cut
+
+sub cupola
+{
+    my( $N ) = @_;
+    return __SUB__ unless defined $N;
+
+    my $prism = prism( $N*2 );
+    my( $face ) = grep { scalar( @$_ ) == $N*2 } $prism->faces;
+    my @face = _face_in_order( $prism, @$face );
+    while( @face ) {
+        $prism->delete_edge( shift @face, shift @face );
+    }
+    return $prism;
+}
+
 =method C<octahedron>
 
 Creates a regular octahedron.
@@ -228,8 +250,8 @@ sub prism
     for (0..($N-1)) {
         $self->add_edge( $F1[$_], $F2[$_] );
         push @faces, Set::Scalar->new( $F1[$_], $F2[$_],
-                                       $F1[($_+1) % ($N*2)],
-                                       $F2[($_+1) % ($N*2)] );
+                                       $F1[($_+1) % $N],
+                                       $F2[($_+1) % $N] );
     }
 
     $self->set_graph_attribute( 'faces', \@faces );
@@ -396,6 +418,47 @@ sub deep_copy
     my( $self ) = @_;
     my $copy = $self->SUPER::deep_copy;
     return bless $copy; # FIXME: Bless with the same class
+}
+
+=method C<delete_edge>
+
+Deletes an edge by merging its vertices.
+Given edge is assumed to exist, a check will be implemented later.
+Modifies and returns the original object.
+
+=cut
+
+sub delete_edge
+{
+    my( $self, $vertex1, $vertex2 ) = @_;
+    my @neighbours = ( $self->neighbours( $vertex1 ),
+                       $self->neighbours( $vertex2 ) );
+    $self->SUPER::delete_vertex( $vertex1 ); # delete_vertices() does not work
+    $self->SUPER::delete_vertex( $vertex2 );
+
+    my $vertex = join '', sort ( $vertex1, $vertex2 );
+
+    for (@neighbours) {
+        next if $_ eq $vertex1;
+        next if $_ eq $vertex2;
+        $self->add_edge( $vertex, $_ );
+    }
+
+    my @faces;
+    for (@{$self->get_graph_attribute( 'faces' )}) {
+        if( $_->has( $vertex1 ) ) {
+            $_->delete( $vertex1 );
+            $_->insert( $vertex );
+        }
+        if( $_->has( $vertex2 ) ) {
+            $_->delete( $vertex2 );
+            $_->insert( $vertex );
+        }
+        push @faces, $_;
+    }
+
+    $self->set_graph_attribute( 'faces', \@faces );
+    return $self;
 }
 
 =method C<delete_face>
@@ -615,6 +678,21 @@ Copies the given polyhedron, truncates all its vertices and returns the truncate
 sub truncated($)
 {
     return $_[0]->deep_copy->truncate;
+}
+
+sub _face_in_order
+{
+    my( $graph, @face ) = @_;
+    my $subgraph = $graph->subgraph( \@face );
+    my @order;
+    while( $subgraph->vertices ) {
+        my $next;
+        ( $next ) = sort grep { $subgraph->degree( $_ ) == 1 } $subgraph->vertices;
+        ( $next ) = sort $subgraph->vertices unless $next;
+        push @order, $next;
+        $subgraph->SUPER::delete_vertex( $next );
+    }
+    return @order;
 }
 
 sub _names
