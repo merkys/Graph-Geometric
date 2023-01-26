@@ -318,6 +318,13 @@ sub regular_icosahedron()
     return regular_dodecahedron->dual;
 }
 
+=method C<rotunda>
+
+Given N, creates an N-gonal rotunda.
+If N is not given, returns a code reference to itself.
+
+=cut
+
 sub rotunda
 {
     my( $N ) = @_;
