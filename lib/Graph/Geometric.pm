@@ -22,6 +22,7 @@ my @subs = qw(
     cucurbituril
     cupola
     octahedron
+    orthobicupola
     pentagonal_trapezohedron
     prism
     pyramid
