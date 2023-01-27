@@ -572,6 +572,50 @@ sub carve_edge
 
     return $self;
 }
+=method C<carve_face>
+
+Given a graph and a pair of vertices lying on the same face, add a new edge splitting the face in two.
+Subroutine dies if there is no face containing both vertices.
+
+=cut
+
+sub carve_face
+{
+    my( $self, @edge ) = @_;
+    return $self if $self->has_edge( @edge ); # has edge already
+
+    # Find a face containing both vertices, filter it out from face list
+    my @faces;
+    my $face;
+    for (@{$self->get_graph_attribute( 'faces' )}) {
+        if( $_->has( $edge[0] ) && $_->has( $edge[1] ) ) {
+            $face = $_;
+        } else {
+            push @faces, $_;
+        }
+    }
+    die 'there is no face with both to-be-joined vertices' unless $face;
+
+    $self->add_edge( @edge );
+
+    my @face = _face_in_order( $face->members );
+    # "Rewind" the vertices in cycle to start with the first joined vertex
+    while( $face[0] ne $edge[0] ) {
+        push @face, shift @face;
+    }
+    # Store all vertices in @F1 until the second joined vertex is reached
+    my @F1;
+    while( $face[0] ne $edge[1] ) {
+        push @F1, shift @face;
+    }
+    push @F1, $edge[1];
+    my @F2 = ( @face, $edge[0] );
+
+    push @faces, @F1, @F2;
+    $self->set_graph_attribute( 'faces', \@faces );
+
+    return $self;
+}
 
 sub face_dualify
 {
