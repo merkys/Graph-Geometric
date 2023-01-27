@@ -215,6 +215,45 @@ sub octahedron()
     return bipyramid( 4 );
 }
 
+sub orthobicupola
+{
+    my( $N ) = @_;
+    return __SUB__ unless defined $N;
+
+    my $prism = prism( $N*2 );
+    # FIXME: The following is unstable in cubes
+    my( $F1, $F2 ) = grep { scalar( @$_ ) == $N*2 } $prism->faces;
+
+    # Carve side edges
+    my @side_edges = $prism->subgraph( $F1, $F2 )->edges;
+    for( @side_edges ) {
+        $prism->carve_edge( @$_ );
+    }
+
+    # Align vertices in both faces
+    my @F1 = _face_in_order( $prism, @$F1 );
+    my @F2;
+    for my $vertex (@F1) {
+        my( $edge ) = grep { $_->[0] eq $vertex || $_->[1] eq $vertex } @side_edges;
+        push @F2, grep { $_ ne $vertex } @$edge;
+    }
+
+    # Carve all side faces
+    for (0..($N-1)) {
+        $prism->carve_face( join( '', sort ( $F1[$_], $F2[$_] ) ),
+                            join( '', sort ( $F1[($_+1) % $N], $F2[($_+1) % $N] ) ) );
+    }
+
+    while( @F1 ) {
+        $prism->delete_edge( shift @F1, shift @F1 );
+    }
+    while( @F2 ) {
+        $prism->delete_edge( shift @F2, shift @F2 );
+    }
+
+    return $prism;
+}
+
 =method C<pentagonal_trapezohedron>
 
 Creates a pentagonal trapezohedron.
