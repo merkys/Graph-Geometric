@@ -521,6 +521,7 @@ sub delete_edge
     $self->SUPER::delete_vertex( $vertex2 );
 
     my $vertex = join '', sort ( $vertex1, $vertex2 );
+    $self->_ensure_vertices_do_not_exist( $vertex );
 
     for (@neighbours) {
         next if $_ eq $vertex1;
@@ -559,6 +560,7 @@ sub delete_face
     my( $self, $face ) = @_;
 
     my $vertex = join '', sort @$face;
+    $self->_ensure_vertices_do_not_exist( $vertex );
     $self->add_vertex( $vertex );
 
     for my $member (@$face) {
@@ -617,6 +619,7 @@ sub carve_edge
 
     $self->SUPER::delete_edge( @edge );
     my $vertex = join '', sort @edge;
+    $self->_ensure_vertices_do_not_exist( $vertex );
 
     # Add new vertex in between the given ones
     $self->add_path( $edge[0], $vertex, $edge[1] );
@@ -721,6 +724,7 @@ sub stellate
         if( grep { join( '', sort @$face ) eq join( '', sort @$_ ) } @faces ) {
             # This face has been requested to be stellated
             my $center = join '', @$face;
+            $self->_ensure_vertices_do_not_exist( $center );
             $self->add_vertex( $center );
             for my $vertex (@$face) {
                 $self->add_edge( $center, $vertex );
@@ -754,7 +758,8 @@ sub truncate
     for my $vertex (@vertices) {
         # Cut all the edges
         for my $neighbour ($self->neighbours( $vertex )) {
-            $self->add_edge( $neighbour, $vertex . $neighbour ); # TODO: Ensure such vertex does not exist
+            $self->_ensure_vertices_do_not_exist( $vertex . $neighbour );
+            $self->add_edge( $neighbour, $vertex . $neighbour );
         }
 
         # Trim all the faces
@@ -856,6 +861,14 @@ Copies the given polyhedron, truncates all its vertices and returns the truncate
 sub truncated($)
 {
     return $_[0]->deep_copy->truncate;
+}
+
+sub _ensure_vertices_do_not_exist
+{
+    my( $graph, @vertices ) = @_;
+    for (@vertices) {
+        die "vertex $_ already exists\n" if $graph->has_vertex( $_ );
+    }
 }
 
 sub _face_in_order
