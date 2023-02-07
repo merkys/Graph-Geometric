@@ -30,7 +30,6 @@ my @subs = qw(
     stellated
     trapezohedron
     truncated
-    truncated_icosahedron
 );
 push @subs, map { $_ . 'gonal' } @polygon_names[1..$#polygon_names];
 
@@ -446,17 +445,6 @@ sub trapezohedron
 
     $self->set_graph_attribute( 'faces', \@faces );
     return bless $self; # TODO: Bless with class?
-}
-
-=method C<truncated_icosahedron>
-
-Creates a truncated icosahedron.
-
-=cut
-
-sub truncated_icosahedron()
-{
-    return regular_icosahedron->truncate;
 }
 
 =head1 ACCESSORS
