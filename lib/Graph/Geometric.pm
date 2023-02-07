@@ -601,6 +601,8 @@ sub delete_vertex
     my @other_faces      = grep { !$_->has( $vertex ) }
                                 @{$self->get_graph_attribute( 'faces' )};
 
+    return $self unless @containing_faces;
+
     my $new_face = sum( @containing_faces );
     $new_face->delete( $vertex );
 
