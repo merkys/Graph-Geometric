@@ -255,7 +255,7 @@ sub orthobicupola
     }
 
     # Carve all side faces
-    for (0..($N-1)) {
+    for (0..($N*2-1)) {
         $prism->carve_face( join( '', sort ( $F1[$_], $F2[$_] ) ),
                             join( '', sort ( $F1[($_+1) % ($N*2)], $F2[($_+1) % ($N*2)] ) ) );
     }
