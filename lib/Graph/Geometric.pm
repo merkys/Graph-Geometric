@@ -513,6 +513,8 @@ Modifies and returns the original object.
 sub delete_edge
 {
     my( $self, $vertex1, $vertex2 ) = @_;
+    return $self unless $self->has_edge( $vertex1, $vertex2 );
+
     my @neighbours = ( $self->neighbours( $vertex1 ),
                        $self->neighbours( $vertex2 ) );
     $self->SUPER::delete_vertex( $vertex1 ); # delete_vertices() does not work
