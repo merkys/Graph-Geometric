@@ -876,12 +876,12 @@ sub _face_in_order
     my( $graph, @face ) = @_;
     my $subgraph = $graph->subgraph( \@face );
     my @order;
+    my( $current ) = sort $subgraph->vertices;
     while( $subgraph->vertices ) {
-        my $next;
-        ( $next ) = sort grep { $subgraph->degree( $_ ) == 1 } $subgraph->vertices;
-        ( $next ) = sort $subgraph->vertices unless $next;
-        push @order, $next;
-        $subgraph->SUPER::delete_vertex( $next );
+        my( $next ) = sort $subgraph->neighbours( $current );
+        push @order, $current;
+        $subgraph->SUPER::delete_vertex( $current );
+        $current = $next;
     }
     return @order;
 }
