@@ -23,7 +23,6 @@ my @subs = qw(
     cupola
     octahedron
     orthobicupola
-    pentagonal_trapezohedron
     prism
     pyramid
     regular_icosahedron
@@ -270,18 +269,6 @@ sub orthobicupola
     return $prism;
 }
 
-=method C<pentagonal_trapezohedron>
-
-Creates a pentagonal trapezohedron.
-This method may be removed later on in favour of more general C<trapezohedron> method.
-
-=cut
-
-sub pentagonal_trapezohedron()
-{
-    return trapezohedron( 5 );
-}
-
 =method C<prism>
 
 Given N, creates an N-gonal prism.
@@ -356,7 +343,7 @@ Word "regular" may in future disappear from method's name.
 
 sub regular_dodecahedron()
 {
-    my $pt = pentagonal_trapezohedron;
+    my $pt = trapezohedron( 5 );
     $pt->truncate( 'A', 'B' );
     return $pt;
 }

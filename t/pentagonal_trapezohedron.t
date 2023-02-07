@@ -6,8 +6,7 @@ use warnings;
 use Graph::Geometric;
 use Test::More;
 
-my @cases = ( pentagonal_trapezohedron,
-              pentagonal trapezohedron );
+my @cases = ( pentagonal trapezohedron );
 
 plan tests => 3 * scalar @cases;
 
