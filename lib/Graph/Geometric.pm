@@ -216,17 +216,32 @@ sub octahedron()
     return bipyramid( 4 );
 }
 
+=method C<orthobicupola>
+
+Implementation detail: orthobicupola is constructed by creating a prism, carving its side edges in half, joining the midpoints and removing every second edge on top and bottom faces.
+
+=cut
+
 sub orthobicupola
 {
     my( $N ) = @_;
     return __SUB__ unless defined $N;
 
     my $prism = prism( $N*2 );
+
+    # Find top and bottom faces by the number of vertices in them
     # FIXME: The following is unstable in cubes
     my( $F1, $F2 ) = grep { scalar( @$_ ) == $N*2 } $prism->faces;
 
+    # Select size edges, Graph::subgraph() does not work somewhy
+    my @side_edges;
+    for ($prism->edges) {
+        my $in_F1 = (Set::Scalar->new( @$F1 ) * Set::Scalar->new( @$_ ))->size;
+        my $in_F2 = (Set::Scalar->new( @$F2 ) * Set::Scalar->new( @$_ ))->size;
+        push @side_edges, $_ if $in_F1 && $in_F2;
+    }
+
     # Carve side edges
-    my @side_edges = $prism->subgraph( $F1, $F2 )->edges;
     for( @side_edges ) {
         $prism->carve_edge( @$_ );
     }
@@ -634,11 +649,14 @@ sub carve_face
             push @faces, $_;
         }
     }
-    die 'there is no face with both to-be-joined vertices' unless $face;
+    if( !$face ) {
+        local $" = ' and ';
+        die "there is no face having both @edge vertices\n";
+    }
 
     $self->add_edge( @edge );
 
-    my @face = _face_in_order( $face->members );
+    my @face = _face_in_order( $self, $face->members );
     # "Rewind" the vertices in cycle to start with the first joined vertex
     while( $face[0] ne $edge[0] ) {
         push @face, shift @face;
@@ -651,7 +669,7 @@ sub carve_face
     push @F1, $edge[1];
     my @F2 = ( @face, $edge[0] );
 
-    push @faces, @F1, @F2;
+    push @faces, Set::Scalar->new( @F1 ), Set::Scalar->new( @F2 );
     $self->set_graph_attribute( 'faces', \@faces );
 
     return $self;
