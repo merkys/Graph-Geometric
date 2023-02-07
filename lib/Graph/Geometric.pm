@@ -538,7 +538,7 @@ sub delete_edge
             $_->delete( $vertex2 );
             $_->insert( $vertex );
         }
-        push @faces, $_;
+        push @faces, $_ if $_->size > 2; # Exclude collapsed faces
     }
 
     $self->set_graph_attribute( 'faces', \@faces );
