@@ -658,10 +658,10 @@ sub carve_face
         local $" = ' and ';
         die "there is no face having both @edge vertices\n";
     }
+    my @face = _face_in_order( $self, $face->members );
 
     $self->add_edge( @edge );
 
-    my @face = _face_in_order( $self, $face->members );
     # "Rewind" the vertices in cycle to start with the first joined vertex
     while( $face[0] ne $edge[0] ) {
         push @face, shift @face;
