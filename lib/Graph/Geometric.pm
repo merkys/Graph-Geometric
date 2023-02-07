@@ -21,11 +21,12 @@ my @subs = qw(
     bipyramid
     cucurbituril
     cupola
+    dodecahedron
+    icosahedron
     octahedron
     orthobicupola
     prism
     pyramid
-    regular_icosahedron
     rotunda
     stellated
     trapezohedron
@@ -53,7 +54,7 @@ sub AUTOLOAD {
     use Graph::Geometric;
 
     # Generate a truncated regular icosahedron
-    my $g = regular_icosahedron->truncated;
+    my $g = icosahedron->truncated;
 
     # Count the faces
     print scalar $g->faces;
@@ -203,6 +204,30 @@ sub cupola
     return $prism;
 }
 
+=method C<dodecahedron>
+
+Creates a regular dodecahedron.
+
+=cut
+
+sub dodecahedron()
+{
+    my $pt = trapezohedron( 5 );
+    $pt->truncate( 'A', 'B' );
+    return $pt;
+}
+
+=method C<icosahedron>
+
+Creates a regular icosahedron.
+
+=cut
+
+sub icosahedron()
+{
+    return dodecahedron->dual;
+}
+
 =method C<octahedron>
 
 Creates a regular octahedron.
@@ -331,32 +356,6 @@ sub pyramid
 
     $self->set_graph_attribute( 'faces', \@faces );
     return bless $self;
-}
-
-=method C<regular_dodecahedron>
-
-Creates a regular dodecahedron.
-Word "regular" may in future disappear from method's name.
-
-=cut
-
-sub regular_dodecahedron()
-{
-    my $pt = trapezohedron( 5 );
-    $pt->truncate( 'A', 'B' );
-    return $pt;
-}
-
-=method C<regular_icosahedron>
-
-Creates a regular icosahedron.
-Word "regular" may in future disappear from method's name.
-
-=cut
-
-sub regular_icosahedron()
-{
-    return regular_dodecahedron->dual;
 }
 
 =method C<rotunda>
