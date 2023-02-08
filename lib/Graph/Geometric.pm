@@ -13,7 +13,11 @@ Graph::Geometric - create and work with geometric graphs
 # ABSTRACT: Create and work with geometric graphs
 # VERSION
 
-use parent 'Graph::Undirected', 'Exporter';
+use Exporter;
+use Graph 0.9713;
+use Graph::Undirected;
+
+use parent Graph::Undirected::, Exporter::;
 
 our @polygon_names = (
     '', 'mono', 'di', 'tri', 'tetra', 'penta', 'hexa', 'hepta', 'octa', 'nona', 'deca',
