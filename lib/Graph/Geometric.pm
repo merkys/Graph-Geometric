@@ -452,13 +452,21 @@ sub trapezohedron
 
 Returns an array of arrays listing vertices in each of polyhedron's faces.
 Vertex lists are returned sorted, they do not maintain the order of vertices in faces.
+Experimental: given a list of vertices, select only faces containing all of them.
 
 =cut
 
 sub faces
 {
-    my( $self ) = @_;
-    return map { [ sort $_->members ] } @{$self->get_graph_attribute( 'faces' )};
+    my( $self, @vertices ) = @_;
+
+    my @faces = @{$self->get_graph_attribute( 'faces' )};
+    if( @vertices ) {
+        my $subset = Set::Scalar->new( @vertices );
+        @faces = grep { $subset <= $_ } @faces;
+    }
+
+    return map { [ sort $_->members ] } @faces;
 }
 
 =head1 GRAPH METHODS
