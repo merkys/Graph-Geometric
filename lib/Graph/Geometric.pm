@@ -896,6 +896,16 @@ sub dual
     return bless $dual; # TODO: Bless with a class
 }
 
+=head1 OPERATORS
+
+The following class methods take a single Graph::Geometric object, copy it, perform a certain operation and return the results.
+They allow for such syntactically sweet calls like:
+
+    my $cuboctahedron1 = rectified tetragonal prism;
+    my $cuboctahedron2 = rectified octahedron;
+
+    my $truncated_icosahedron = truncated icosahedron;
+
 =head2 C<rectified()>
 
 Copies the given polyhedron, rectifies it and returns the rectified polyhedron.
