@@ -4,6 +4,12 @@ use strict;
 use warnings;
 use feature qw(current_sub);
 
+=head1 NAME
+
+Graph::Geometric - create and work with geometric graphs
+
+=cut
+
 # ABSTRACT: Create and work with geometric graphs
 # VERSION
 
@@ -970,5 +976,11 @@ sub _polygon_name_to_number
     my( $number ) = grep { $name eq $polygon_names[$_] } 0..$#polygon_names;
     return $number;
 }
+
+=head1 AUTHORS
+
+Andrius Merkys, E<lt>merkys@cpan.orgE<gt>
+
+=cut
 
 1;
