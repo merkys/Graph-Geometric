@@ -81,7 +81,7 @@ Some syntax sugar may also appear.
 
 =head1 CONSTRUCTORS
 
-=head2 C<antiprism>
+=head2 C<antiprism( $N )>
 
 Given N, creates an N-gonal antiprism.
 If N is not given, returns a code reference to itself.
@@ -116,7 +116,7 @@ sub antiprism
     return bless $self;
 }
 
-=head2 C<bipyramid>
+=head2 C<bipyramid( $N )>
 
 Given N, creates an N-gonal bipyramid.
 If N is not given, returns a code reference to itself.
@@ -134,7 +134,7 @@ sub bipyramid
     return $pyramid;
 }
 
-=head2 C<cucurbituril>
+=head2 C<cucurbituril( $N )>
 
 Given N, creates a geometric graph representing chemical structure of cucurbit[N]uril.
 Cucurbiturils do not exacly fit the definition of polyhedra, but have nevertheless interesting structures.
@@ -186,7 +186,7 @@ sub cucurbituril
     return bless $self;
 }
 
-=head2 C<cupola>
+=head2 C<cupola( $N )>
 
 Given N, creates an N-gonal cupola.
 If N is not given, returns a code reference to itself.
@@ -207,7 +207,7 @@ sub cupola
     return $prism;
 }
 
-=head2 C<dodecahedron>
+=head2 C<dodecahedron()>
 
 Creates a regular dodecahedron.
 
@@ -220,7 +220,7 @@ sub dodecahedron()
     return $pt;
 }
 
-=head2 C<icosahedron>
+=head2 C<icosahedron()>
 
 Creates a regular icosahedron.
 
@@ -231,7 +231,7 @@ sub icosahedron()
     return dodecahedron->dual;
 }
 
-=head2 C<icosidodecahedron>
+=head2 C<icosidodecahedron()>
 
 Creates an icosidodecahedron.
 
@@ -242,7 +242,7 @@ sub icosidodecahedron()
     return dodecahedron->rectify;
 }
 
-=head2 C<octahedron>
+=head2 C<octahedron()>
 
 Creates a regular octahedron.
 
@@ -253,7 +253,7 @@ sub octahedron()
     return bipyramid( 4 );
 }
 
-=head2 C<orthobicupola>
+=head2 C<orthobicupola( $N )>
 
 Implementation detail: orthobicupola is constructed by creating a prism, carving its side edges in half, joining the midpoints and removing every second edge on top and bottom faces.
 
@@ -307,7 +307,7 @@ sub orthobicupola
     return $prism;
 }
 
-=head2 C<prism>
+=head2 C<prism( $N )>
 
 Given N, creates an N-gonal prism.
 If N is not given, returns a code reference to itself.
@@ -340,7 +340,7 @@ sub prism
     return bless $self;
 }
 
-=head2 C<pyramid>
+=head2 C<pyramid( $N )>
 
 Given N, creates an N-gonal pyramid.
 If N is not given, returns a code reference to itself.
@@ -372,7 +372,7 @@ sub pyramid
     return bless $self;
 }
 
-=head2 C<rhombic_dodecahedron>
+=head2 C<rhombic_dodecahedron()>
 
 Creates a rhombic dodecahedron.
 
@@ -383,7 +383,7 @@ sub rhombic_dodecahedron()
     return octahedron->rectify->dual;
 }
 
-=head2 C<rotunda>
+=head2 C<rotunda( $N )>
 
 Given N, creates an N-gonal rotunda.
 If N is not given, returns a code reference to itself.
@@ -408,7 +408,7 @@ sub rotunda
     return $cupola;
 }
 
-=head2 C<tetrahedron>
+=head2 C<tetrahedron()>
 
 Creates a regular tetrahedron.
 
@@ -435,7 +435,7 @@ sub tetrahedron()
     return bless $self; # TODO: Bless with class?
 }
 
-=head2 C<trapezohedron>
+=head2 C<trapezohedron( $N )>
 
 Creates an N-gonal trapezohedron.
 If N is not given, returns a code reference to itself.
@@ -473,7 +473,7 @@ sub trapezohedron
 
 =head1 ACCESSORS
 
-=head2 C<faces>
+=head2 C<faces( @vertices )>
 
 Returns an array of arrays listing vertices in each of polyhedron's faces.
 Vertex lists are returned sorted, they do not maintain the order of vertices in faces.
@@ -500,7 +500,7 @@ sub faces
 
 =head1 GRAPH METHODS
 
-=head2 C<deep_copy>
+=head2 C<deep_copy()>
 
 Creates a deep copy of a Graph::Geometric object.
 
@@ -513,7 +513,7 @@ sub deep_copy
     return bless $copy; # FIXME: Bless with the same class
 }
 
-=head2 C<delete_edge>
+=head2 C<delete_edge( $u, $v )>
 
 Deletes an edge by merging its vertices.
 Given edge is assumed to exist, a check will be implemented later.
@@ -557,7 +557,7 @@ sub delete_edge
     return $self;
 }
 
-=head2 C<delete_face>
+=head2 C<delete_face( $face )>
 
 Deletes a given face from polyhedra.
 A face is defined by an unordered list of vertices.
@@ -595,7 +595,7 @@ sub delete_face
     return $self;
 }
 
-=head2 C<delete_vertex>
+=head2 C<delete_vertex( $v )>
 
 Handles vertex deletion by merging neighbouring faces.
 Modifies and returns the original object.
@@ -645,7 +645,7 @@ sub carve_edge
 
     return $self;
 }
-=head2 C<carve_face>
+=head2 C<carve_face( $u, $v )>
 
 Given a graph and a pair of vertices lying on the same face, add a new edge splitting the face in two.
 Subroutine dies if there is no face containing both vertices.
@@ -719,7 +719,7 @@ sub face_dualify
     $self->set_graph_attribute( 'faces', \@faces );
 }
 
-=head2 C<rectify>
+=head2 C<rectify()>
 
 Given a polyhedron, performs its rectification.
 Modifies and returns the original object.
@@ -753,7 +753,7 @@ sub rectify
     return $self;
 }
 
-=head2 C<stellate>
+=head2 C<stellate()>
 
 Given a polyhedron and a list of faces, performs stellation of specified faces.
 If no faces are given, all faces are stellated.
@@ -789,7 +789,7 @@ sub stellate
     $self->set_graph_attribute( 'faces', \@faces_now );
 }
 
-=head2 C<truncate>
+=head2 C<truncate()>
 
 Given a polyhedron and a list of vertices, performs truncation of specified vertices.
 If no vertices are given, all vertices are stellated.
@@ -835,7 +835,7 @@ sub truncate
     return $self;
 }
 
-=head2 C<dual>
+=head2 C<dual()>
 
 Given a polyhedron, returns its dual as a new object.
 The original object is not modified.
@@ -888,7 +888,7 @@ sub dual
     return bless $dual; # TODO: Bless with a class
 }
 
-=head2 C<rectified>
+=head2 C<rectified()>
 
 Copies the given polyhedron, rectifies it and returns the rectified polyhedron.
 
@@ -899,7 +899,7 @@ sub rectified($)
     return $_[0]->deep_copy->rectify;
 }
 
-=head2 C<stellated>
+=head2 C<stellated()>
 
 Copies the given polyhedron, stellates all its faces and returns the stellated polyhedron.
 
@@ -910,7 +910,7 @@ sub stellated($)
     return $_[0]->deep_copy->stellate;
 }
 
-=head2 C<truncated>
+=head2 C<truncated()>
 
 Copies the given polyhedron, truncates all its vertices and returns the truncated polyhedron.
 
