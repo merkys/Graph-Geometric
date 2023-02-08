@@ -28,6 +28,7 @@ my @subs = qw(
     prism
     pyramid
     rectified
+    rhombic_dodecahedron
     rotunda
     stellated
     trapezohedron
@@ -357,6 +358,17 @@ sub pyramid
 
     $self->set_graph_attribute( 'faces', \@faces );
     return bless $self;
+}
+
+=method C<rhombic_dodecahedron>
+
+Creates a rhombic dodecahedron.
+
+=cut
+
+sub rhombic_dodecahedron()
+{
+    return octahedron->rectify->dual;
 }
 
 =method C<rotunda>
