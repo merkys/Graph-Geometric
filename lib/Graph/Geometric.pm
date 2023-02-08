@@ -23,6 +23,7 @@ my @subs = qw(
     cupola
     dodecahedron
     icosahedron
+    icosidodecahedron
     octahedron
     orthobicupola
     prism
@@ -228,6 +229,17 @@ Creates a regular icosahedron.
 sub icosahedron()
 {
     return dodecahedron->dual;
+}
+
+=method C<icosidodecahedron>
+
+Creates an icosidodecahedron.
+
+=cut
+
+sub icosidodecahedron()
+{
+    return dodecahedron->rectify;
 }
 
 =method C<octahedron>
