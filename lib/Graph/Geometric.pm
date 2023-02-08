@@ -255,6 +255,8 @@ sub octahedron()
 
 =head2 C<orthobicupola( $N )>
 
+Given N, creates an N-gonal orthobicupola.
+If N is not given, returns a code reference to itself.
 Implementation detail: orthobicupola is constructed by creating a prism, carving its side edges in half, joining the midpoints and removing every second edge on top and bottom faces.
 
 =cut
