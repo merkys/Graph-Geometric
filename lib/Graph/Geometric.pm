@@ -27,6 +27,7 @@ my @subs = qw(
     orthobicupola
     prism
     pyramid
+    rectified
     rotunda
     stellated
     trapezohedron
@@ -36,7 +37,7 @@ push @subs, map { $_ . 'gonal' } @polygon_names[1..$#polygon_names];
 
 our @EXPORT = @subs;
 
-use List::Util qw( sum );
+use List::Util qw( all sum );
 use Set::Scalar;
 
 sub AUTOLOAD {
@@ -462,8 +463,12 @@ sub faces
 
     my @faces = @{$self->get_graph_attribute( 'faces' )};
     if( @vertices ) {
-        my $subset = Set::Scalar->new( @vertices );
-        @faces = grep { $subset <= $_ } @faces;
+        # Set::Scalar::is_subset() fails as of 1.29 for unknown reasons
+        my @faces_now;
+        for my $face (@faces) {
+            push @faces_now, $face if all { $face->has( $_ ) } @vertices;
+        }
+        @faces = @faces_now;
     }
 
     return map { [ sort $_->members ] } @faces;
@@ -690,6 +695,40 @@ sub face_dualify
     $self->set_graph_attribute( 'faces', \@faces );
 }
 
+=method C<rectify>
+
+Given a polyhedron, performs its rectification.
+Modifies and returns the original object.
+
+=cut
+
+sub rectify
+{
+    my( $self ) = @_;
+
+    # Preserve the original list of vertices
+    my @vertices = $self->vertices;
+
+    # Carve all the edges
+    for ($self->edges) {
+        $self->carve_edge( @$_ );
+    }
+
+    # Cut off the original vertices
+    for my $vertex (@vertices) {
+        # Carve all adjacent faces
+        for my $face ($self->faces( $vertex )) {
+            my( $A, $B ) = grep { $self->has_edge( $vertex, $_ ) } @$face;
+            $self->carve_face( $A, $B );
+        }
+
+        # Delete the vertex and merge adjacent faces
+        $self->delete_vertex( $vertex );
+    }
+
+    return $self;
+}
+
 =method C<stellate>
 
 Given a polyhedron and a list of faces, performs stellation of specified faces.
@@ -823,6 +862,17 @@ sub dual
     $dual->set_graph_attribute( 'faces', \@dual_faces );
 
     return bless $dual; # TODO: Bless with a class
+}
+
+=method C<rectified>
+
+Copies the given polyhedron, rectifies it and returns the rectified polyhedron.
+
+=cut
+
+sub rectified($)
+{
+    return $_[0]->deep_copy->rectify;
 }
 
 =method C<stellated>
