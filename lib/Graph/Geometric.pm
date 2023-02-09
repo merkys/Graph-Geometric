@@ -126,6 +126,47 @@ sub antiprism
     return bless $self;
 }
 
+sub bifrustum
+{
+    my( $N ) = @_;
+    return __SUB__ unless defined $N;
+
+    my $prism = prism( $N );
+
+    # Find top and bottom faces by the number of vertices in them
+    # FIXME: The following is unstable in cubes
+    my( $F1, $F2 ) = grep { scalar( @$_ ) == $N } $prism->faces;
+
+    # Select size edges, Graph::subgraph() does not work somewhy
+    my @side_edges;
+    for ($prism->edges) {
+        my $in_F1 = (Set::Scalar->new( @$F1 ) * Set::Scalar->new( @$_ ))->size;
+        my $in_F2 = (Set::Scalar->new( @$F2 ) * Set::Scalar->new( @$_ ))->size;
+        push @side_edges, $_ if $in_F1 && $in_F2;
+    }
+
+    # Carve side edges
+    for( @side_edges ) {
+        $prism->carve_edge( @$_ );
+    }
+
+    # Align vertices in both faces
+    my @F1 = _face_in_order( $prism, @$F1 );
+    my @F2;
+    for my $vertex (@F1) {
+        my( $edge ) = grep { $_->[0] eq $vertex || $_->[1] eq $vertex } @side_edges;
+        push @F2, grep { $_ ne $vertex } @$edge;
+    }
+
+    # Carve all side faces
+    for (0..($N-1)) {
+        $prism->carve_face( join( '', sort ( $F1[$_], $F2[$_] ) ),
+                            join( '', sort ( $F1[($_+1) % $N], $F2[($_+1) % $N] ) ) );
+    }
+
+    return $prism;
+}
+
 =head2 C<bipyramid( $N )>
 
 Given N, creates an N-gonal bipyramid.
@@ -276,47 +317,36 @@ sub orthobicupola
     my( $N ) = @_;
     return __SUB__ unless defined $N;
 
-    my $prism = prism( $N*2 );
+    my $bifrustum = bifrustum( $N*2 );
 
-    # Find top and bottom faces by the number of vertices in them
-    # FIXME: The following is unstable in cubes
-    my( $F1, $F2 ) = grep { scalar( @$_ ) == $N*2 } $prism->faces;
-
-    # Select size edges, Graph::subgraph() does not work somewhy
-    my @side_edges;
-    for ($prism->edges) {
-        my $in_F1 = (Set::Scalar->new( @$F1 ) * Set::Scalar->new( @$_ ))->size;
-        my $in_F2 = (Set::Scalar->new( @$F2 ) * Set::Scalar->new( @$_ ))->size;
-        push @side_edges, $_ if $in_F1 && $in_F2;
+    # All side vertices, and only them, have degree of 4
+    my @side_vertices = $bifrustum->_face_in_order( grep { $bifrustum->degree( $_ ) == 4 }
+                                                         $bifrustum->vertices );
+    # Find top and bottom faces by removing side vertices
+    my $copy = $bifrustum->copy;
+    for (@side_vertices) {
+        $copy->SUPER::delete_vertex( $_ );
     }
+    my( $F1, $F2 ) = $copy->connected_components;
 
-    # Carve side edges
-    for( @side_edges ) {
-        $prism->carve_edge( @$_ );
-    }
-
-    # Align vertices in both faces
-    my @F1 = _face_in_order( $prism, @$F1 );
-    my @F2;
-    for my $vertex (@F1) {
-        my( $edge ) = grep { $_->[0] eq $vertex || $_->[1] eq $vertex } @side_edges;
-        push @F2, grep { $_ ne $vertex } @$edge;
-    }
-
-    # Carve all side faces
-    for (0..($N*2-1)) {
-        $prism->carve_face( join( '', sort ( $F1[$_], $F2[$_] ) ),
-                            join( '', sort ( $F1[($_+1) % ($N*2)], $F2[($_+1) % ($N*2)] ) ) );
+    # Collect face vertices in the same order
+    my( @F1, @F2 );
+    for my $vertex (@side_vertices) {
+        my( $v1, $v2 ) = grep { $bifrustum->degree( $_ ) == 3 }
+                              $bifrustum->neighbours( $vertex );
+        ( $v1, $v2 ) = ( $v2, $v1 ) if grep { $_ eq $v2 } @$F1;
+        push @F1, $v1;
+        push @F2, $v2;
     }
 
     while( @F1 ) {
-        $prism->delete_edge( shift @F1, shift @F1 );
+        $bifrustum->delete_edge( shift @F1, shift @F1 );
     }
     while( @F2 ) {
-        $prism->delete_edge( shift @F2, shift @F2 );
+        $bifrustum->delete_edge( shift @F2, shift @F2 );
     }
 
-    return $prism;
+    return $bifrustum;
 }
 
 =head2 C<prism( $N )>
@@ -765,7 +795,7 @@ sub rectify
     return $self;
 }
 
-=head2 C<stellate()>
+=head2 C<stellate( @faces )>
 
 Given a polyhedron and a list of faces, performs stellation of specified faces.
 If no faces are given, all faces are stellated.
@@ -801,7 +831,7 @@ sub stellate
     $self->set_graph_attribute( 'faces', \@faces_now );
 }
 
-=head2 C<truncate()>
+=head2 C<truncate( @vertices )>
 
 Given a polyhedron and a list of vertices, performs truncation of specified vertices.
 If no vertices are given, all vertices are stellated.
