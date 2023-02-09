@@ -170,7 +170,7 @@ sub bifrustum
     }
 
     # Align vertices in both faces
-    my @F1 = _face_in_order( $prism, @$F1 );
+    my @F1 = $prism->_cycle_in_order( @$F1 );
     my @F2;
     for my $vertex (@F1) {
         my( $edge ) = grep { $_->[0] eq $vertex || $_->[1] eq $vertex } @side_edges;
@@ -270,7 +270,7 @@ sub cupola
 
     my $prism = prism( $N*2 );
     my( $face ) = grep { scalar( @$_ ) == $N*2 } $prism->faces;
-    my @face = _face_in_order( $prism, @$face );
+    my @face = $prism->_cycle_in_order( @$face );
     while( @face ) {
         $prism->delete_edge( shift @face, shift @face );
     }
@@ -307,8 +307,8 @@ sub gyrobicupola
 
     # All side vertices, and only them, have degree of 4
     my @side_vertices =
-        $bifrustum->_face_in_order( grep { $bifrustum->degree( $_ ) == 4 }
-                                         $bifrustum->vertices );
+        $bifrustum->_cycle_in_order( grep { $bifrustum->degree( $_ ) == 4 }
+                                          $bifrustum->vertices );
 
     # Top and bottom faces consist only of vertices of degree 3
     my( $F1, $F2 ) = grep { all { $bifrustum->degree( $_ ) == 3 } @$_ }
@@ -385,8 +385,8 @@ sub orthobicupola
 
     # All side vertices, and only them, have degree of 4
     my @side_vertices =
-        $bifrustum->_face_in_order( grep { $bifrustum->degree( $_ ) == 4 }
-                                         $bifrustum->vertices );
+        $bifrustum->_cycle_in_order( grep { $bifrustum->degree( $_ ) == 4 }
+                                          $bifrustum->vertices );
 
     # Top and bottom faces consist only of vertices of degree 3
     my( $F1, $F2 ) = grep { all { $bifrustum->degree( $_ ) == 3 } @$_ }
@@ -776,7 +776,7 @@ sub carve_face
         local $" = ' and ';
         die "there is no face having both @edge vertices\n";
     }
-    my @face = _face_in_order( $self, $face->members );
+    my @face = $self->_cycle_in_order( $face->members );
 
     $self->add_edge( @edge );
 
@@ -809,7 +809,7 @@ sub face_dualify
         push @faces, $face;
     }
 
-    @face = _face_in_order( $self, @face );
+    @face = $self->_cycle_in_order( @face );
     my @new_vertices;
     for (0..$#face) {
         my @edge = sort ( $face[$_], $face[($_+1) % scalar @face] );
@@ -1036,15 +1036,7 @@ sub truncated($)
     return $_[0]->deep_copy->truncate;
 }
 
-sub _ensure_vertices_do_not_exist
-{
-    my( $graph, @vertices ) = @_;
-    for (@vertices) {
-        die "vertex $_ already exists\n" if $graph->has_vertex( $_ );
-    }
-}
-
-sub _face_in_order
+sub _cycle_in_order
 {
     my( $graph, @face ) = @_;
     my $subgraph = $graph->subgraph( \@face );
@@ -1057,6 +1049,14 @@ sub _face_in_order
         $current = $next;
     }
     return @order;
+}
+
+sub _ensure_vertices_do_not_exist
+{
+    my( $graph, @vertices ) = @_;
+    for (@vertices) {
+        die "vertex $_ already exists\n" if $graph->has_vertex( $_ );
+    }
 }
 
 sub _names
