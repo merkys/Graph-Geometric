@@ -33,6 +33,7 @@ my @subs = qw(
     cucurbituril
     cupola
     dodecahedron
+    gyrobicupola
     icosahedron
     icosidodecahedron
     octahedron
@@ -278,6 +279,51 @@ sub dodecahedron()
     my $pt = trapezohedron( 5 );
     $pt->truncate( 'A', 'B' );
     return $pt;
+}
+
+=head2 C<gyrobicupola( $N )>
+
+Given N, creates an N-gonal gyrobicupola.
+If N is not given, returns a code reference to itself.
+Implementation detail: gyrobicupola is constructed by creating a bifrustum and removing every second edge on top and bottom faces.
+
+=cut
+
+sub gyrobicupola
+{
+    my( $N ) = @_;
+    return __SUB__ unless defined $N;
+
+    my $bifrustum = bifrustum( $N*2 );
+
+    # All side vertices, and only them, have degree of 4
+    my @side_vertices =
+        $bifrustum->_face_in_order( grep { $bifrustum->degree( $_ ) == 4 }
+                                         $bifrustum->vertices );
+
+    # Top and bottom faces consist only of vertices of degree 3
+    my( $F1, $F2 ) = grep { all { $bifrustum->degree( $_ ) == 3 } @$_ }
+                          $bifrustum->faces;
+
+    # Collect face vertices in the same order
+    my( @F1, @F2 );
+    for my $vertex (@side_vertices) {
+        my( $v1, $v2 ) = grep { $bifrustum->degree( $_ ) == 3 }
+                              $bifrustum->neighbours( $vertex );
+        ( $v1, $v2 ) = ( $v2, $v1 ) if grep { $_ eq $v2 } @$F1;
+        push @F1, $v1;
+        push @F2, $v2;
+    }
+
+    push @F2, shift @F2;
+    while( @F1 ) {
+        $bifrustum->delete_edge( shift @F1, shift @F1 );
+    }
+    while( @F2 ) {
+        $bifrustum->delete_edge( shift @F2, shift @F2 );
+    }
+
+    return $bifrustum;
 }
 
 =head2 C<icosahedron()>
