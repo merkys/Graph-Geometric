@@ -2,7 +2,7 @@ package Graph::Geometric;
 
 use strict;
 use warnings;
-use feature qw(current_sub);
+use feature qw(current_sub); # Perl v5.16 or later
 
 =head1 NAME
 
