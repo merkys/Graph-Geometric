@@ -1083,7 +1083,7 @@ sub is_isohedral
 =head2 C<is_regular()>
 
 Tests if given polyhedron is regular.
-A regular polyhedron is edge-transitive, vertex-transitive and face-transitive.
+A regular polyhedron is vertex-transitive, edge-transitive and face-transitive.
 Requires L<Graph::Nauty> to locate symmetry orbits of a graph.
 
 =cut
@@ -1092,6 +1092,21 @@ sub is_regular
 {
     my( $self ) = @_;
     return $self->is_isogonal && $self->is_isotoxal && $self->is_isohedral;
+}
+
+=head2 C<is_quasiregular()>
+
+Tests if given quasiregular is regular.
+A quasiregular polyhedron is vertex-transitive and edge-transitive, has two kinds of faces.
+Requires L<Graph::Nauty> to locate symmetry orbits of a graph.
+
+=cut
+
+sub is_quasiregular
+{
+    my( $self ) = @_;
+    return $self->is_isogonal && $self->is_isotoxal &&
+           scalar( Graph::Nauty::orbits( $self->dual, sub { return '' } ) ) == 2;
 }
 
 sub _cycle_in_order
