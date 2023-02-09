@@ -1080,6 +1080,20 @@ sub is_isohedral
     return $self->dual->is_isogonal;
 }
 
+=head2 C<is_regular()>
+
+Tests if given polyhedron is regular.
+A regular polyhedron is edge-transitive, vertex-transitive and face-transitive.
+Requires L<Graph::Nauty> to locate symmetry orbits of a graph.
+
+=cut
+
+sub is_regular
+{
+    my( $self ) = @_;
+    return $self->is_isogonal && $self->is_isotoxal && $self->is_isohedral;
+}
+
 sub _cycle_in_order
 {
     my( $graph, @face ) = @_;
