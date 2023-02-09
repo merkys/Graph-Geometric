@@ -1040,7 +1040,7 @@ sub truncated($)
 
 =head2 C<is_isogonal()>
 
-Tests if a given polyhedron is isogonal (vertex-transitive) by checking whether all vertices belong to the same symmetry orbit.
+Tests if a given polyhedron is isogonal (vertex-transitive) by checking whether all its vertices belong to the same symmetry orbit.
 Requires L<Graph::Nauty> to locate symmetry orbits of a graph.
 
 =cut
@@ -1051,6 +1051,14 @@ sub is_isogonal
     require Graph::Nauty;
     return scalar( Graph::Nauty::orbits( $self, sub { return '' } ) ) == 1;
 }
+
+=head2 C<is_isotoxal()>
+
+Tests if a given polyhedron is isotoxal (edge-transitive) by checking whether all its edges belong to the same symmetry orbit.
+Requires L<Graph::Nauty> to locate symmetry orbits of a graph.
+Implementation detail: figure is rectified and tested for being isogonal.
+
+=cut
 
 sub is_isotoxal
 {
