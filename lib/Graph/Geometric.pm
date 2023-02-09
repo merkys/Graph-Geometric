@@ -1052,6 +1052,12 @@ sub is_isogonal
     return scalar( Graph::Nauty::orbits( $self, sub { return '' } ) ) == 1;
 }
 
+sub is_isotoxal
+{
+    my( $self ) = @_;
+    return $self->rectified->is_isogonal;
+}
+
 sub _cycle_in_order
 {
     my( $graph, @face ) = @_;
