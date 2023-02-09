@@ -48,6 +48,7 @@ my @subs = qw(
     truncated
 );
 push @subs, map { $_ . 'gonal' } @polygon_names[1..$#polygon_names];
+push @subs, 'triangular', 'square';
 
 our @EXPORT = @subs;
 
@@ -58,10 +59,18 @@ sub AUTOLOAD {
     our $AUTOLOAD;
     my $call = $AUTOLOAD;
     $call =~ s/.*:://;
-    return if $call eq 'DESTROY' || $call !~ /gonal$/;
-    my $N = _polygon_name_to_number( $call );
-    return unless defined $N;
-    $_[0]->($N);
+    return if $call eq 'DESTROY';
+    if( $call =~ /gonal$/ ) {
+        my $N = _polygon_name_to_number( $call );
+        return unless defined $N;
+        $_[0]->($N);
+    } elsif( $call eq 'triangular' ) {
+        $_[0]->(3);
+    } elsif( $call eq 'square' ) {
+        $_[0]->(4);
+    } else {
+        return;
+    }
 }
 
 =head1 SYNOPSIS
