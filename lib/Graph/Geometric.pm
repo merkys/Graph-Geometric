@@ -1036,6 +1036,22 @@ sub truncated($)
     return $_[0]->deep_copy->truncate;
 }
 
+=head1 PROPERTIES
+
+=head2 C<is_isogonal()>
+
+Tests if a given polyhedron is isogonal (vertex-transitive) by checking whether all vertices belong to the same symmetry orbit.
+Requires L<Graph::Nauty> to locate symmetry orbits of a graph.
+
+=cut
+
+sub is_isogonal
+{
+    my( $self ) = @_;
+    require Graph::Nauty;
+    return scalar( Graph::Nauty::orbits( $self, sub { return '' } ) ) == 1;
+}
+
 sub _cycle_in_order
 {
     my( $graph, @face ) = @_;
