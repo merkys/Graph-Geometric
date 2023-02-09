@@ -329,14 +329,13 @@ sub orthobicupola
     my $bifrustum = bifrustum( $N*2 );
 
     # All side vertices, and only them, have degree of 4
-    my @side_vertices = $bifrustum->_face_in_order( grep { $bifrustum->degree( $_ ) == 4 }
-                                                         $bifrustum->vertices );
-    # Find top and bottom faces by removing side vertices
-    my $copy = $bifrustum->copy;
-    for (@side_vertices) {
-        $copy->SUPER::delete_vertex( $_ );
-    }
-    my( $F1, $F2 ) = $copy->connected_components;
+    my @side_vertices =
+        $bifrustum->_face_in_order( grep { $bifrustum->degree( $_ ) == 4 }
+                                         $bifrustum->vertices );
+
+    # Top and bottom faces consist only of vertices of degree 3
+    my( $F1, $F2 ) = grep { all { $bifrustum->degree( $_ ) == 3 } @$_ }
+                          $bifrustum->faces;
 
     # Collect face vertices in the same order
     my( @F1, @F2 );
