@@ -28,6 +28,7 @@ our @polygon_names = (
 );
 my @subs = qw(
     antiprism
+    bifrustum
     bipyramid
     cucurbituril
     cupola
@@ -125,6 +126,14 @@ sub antiprism
     $self->set_graph_attribute( 'faces', \@faces );
     return bless $self;
 }
+
+=head2 C<bifrustum( $N )>
+
+Given N, creates an N-gonal bifrustum.
+If N is not given, returns a code reference to itself.
+Since C<Graph::Geometric> does not provide coordinates, bifrustum is simply a prism with side faces cut in half.
+
+=cut
 
 sub bifrustum
 {
