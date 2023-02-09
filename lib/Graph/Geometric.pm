@@ -1066,6 +1066,20 @@ sub is_isotoxal
     return $self->rectified->is_isogonal;
 }
 
+=head2 C<is_isohedral()>
+
+Tests if a given polyhedron is isohedral (face-transitive) by checking whether all its faces belong to the same symmetry orbit.
+Requires L<Graph::Nauty> to locate symmetry orbits of a graph.
+Implementation detail: dual of a figure is tested for being isogonal.
+
+=cut
+
+sub is_isohedral
+{
+    my( $self ) = @_;
+    return $self->dual->is_isogonal;
+}
+
 sub _cycle_in_order
 {
     my( $graph, @face ) = @_;
