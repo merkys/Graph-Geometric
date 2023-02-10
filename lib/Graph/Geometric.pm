@@ -826,6 +826,30 @@ sub carve_face
     return $self;
 }
 
+sub _elongate
+{
+    my( $self ) = @_;
+
+    if( !$self->has_graph_attribute( 'constructor' ) ) {
+        die "unknown geometric type for elongation\n";
+    }
+
+    my $constructor = $self->get_graph_attribute( 'constructor' );
+
+    if(      $constructor eq 'bipyramid' ) {
+        # FIXME: Will fail with square bipyramids
+        my @side_vertices = grep { $self->degree( $_ ) == 4 } $self->vertices;
+    } elsif( $constructor eq 'pyramid' ) {
+        my @face = $self->_largest_face;
+    } else {
+        die "do not know how to elongate $constructor\n";
+    }
+
+    $self->delete_graph_attribute( 'constructor' );
+
+    return $self;
+}
+
 sub face_dualify
 {
     my( $self, @face ) = @_;
@@ -1169,6 +1193,17 @@ sub _ensure_vertices_do_not_exist
     for (@vertices) {
         die "vertex $_ already exists\n" if $graph->has_vertex( $_ );
     }
+}
+
+sub _largest_face
+{
+    my( $self ) = @_;
+    my $max;
+    for ($self->faces) {
+        next if defined $max && scalar( @$_ ) <= scalar( @$max );
+        $max = $_;
+    }
+    return @$max;
 }
 
 sub _names
