@@ -687,7 +687,7 @@ sub delete_edge
 
 Deletes a given face from polyhedra.
 A face is defined by an unordered list of vertices.
-Given face is assumed to exist, a check will be implemented later.
+Does nothing if a given face does not exist.
 Modifies and returns the original object.
 
 =cut
@@ -695,6 +695,7 @@ Modifies and returns the original object.
 sub delete_face
 {
     my( $self, $face ) = @_;
+    return $self unless $self->has_face( $face );
 
     my $vertex = join '', sort @$face;
     $self->_ensure_vertices_do_not_exist( $vertex );
@@ -749,6 +750,20 @@ sub delete_vertex
     $self->set_graph_attribute( 'faces', [ @other_faces, $new_face ] );
 
     return $self;
+}
+
+=head2 C<has_face( $face )>
+
+Returns true if a given face exists, false otherwise.
+
+=cut
+
+sub has_face
+{
+    my( $self, $face ) = @_;
+    $face = join ',', sort @$face;
+    return any { join( ',', sort @$_ ) eq $face }
+               @{$self->get_graph_attribute( 'faces' )};
 }
 
 =head1 GEOMETRIC METHODS
