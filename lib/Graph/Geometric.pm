@@ -837,35 +837,10 @@ sub _elongate
     my $constructor = $self->get_graph_attribute( 'constructor' );
 
     if(      $constructor eq 'bipyramid' ) {
-        # FIXME: Will fail with square bipyramids
-        my @side_vertices = grep { $self->degree( $_ ) == 4 }  $self->vertices;
-        my $N =          max map { $self->degree( $_ ) }       $self->vertices;
-        my @apexes =        grep { $self->degree( $_ ) == $N } $self->vertices;
-
-        @side_vertices = $self->_cycle_in_order( @side_vertices );
-
-        my @faces;
-        for my $i (0..$N) {
-            my $vertex = $side_vertices[$i];
-            for my $apex (@apexes) {
-                $self->add_edge( $apex, $apex . $vertex ); # TODO: Check if vertex is free
-            }
-            $self->add_edge( map { $_ . $vertex } @apexes );
-            $self->SUPER::delete_vertex( $vertex );
-
-            push @faces, Set::Scalar->new( $apexes[0],
-                                           $apexes[0] . $side_vertices[$i],
-                                           $apexes[0] . $side_vertices[($i+1) % $N] );
-            push @faces, Set::Scalar->new( $apexes[1],
-                                           $apexes[1] . $side_vertices[$i],
-                                           $apexes[1] . $side_vertices[($i+1) % $N] );
-            push @faces, Set::Scalar->new( $apexes[0] . $side_vertices[$i],
-                                           $apexes[1] . $side_vertices[$i],
-                                           $apexes[0] . $side_vertices[($i+1) % $N],
-                                           $apexes[1] . $side_vertices[($i+1) % $N] );
-        }
-
-        $self->set_graph_attribute( 'faces', \@faces );
+        # FIXME: Will fail with trigonal and square bipyramids
+        # FIXME: Does not maintain vertex names - do we need this?
+        my $N = max map { $self->degree( $_ ) } $self->vertices;
+        $self = bifrustum( $N )->dual;
     } elsif( $constructor eq 'pyramid' ) {
         my @face = $self->_largest_face;
     } else {
@@ -1078,7 +1053,6 @@ sub dual
     }
 
     $dual->set_graph_attribute( 'faces', \@dual_faces );
-    $self->delete_graph_attribute( 'constructor' );
 
     return bless $dual; # TODO: Bless with a class
 }
