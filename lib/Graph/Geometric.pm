@@ -133,6 +133,7 @@ sub antiprism
         push @faces, Set::Scalar->new( map { $vertices[($i*2+$_) % ($N*2)] } 1..3 );
     }
 
+    $self->set_graph_attribute( 'constructor', 'antiprism' );
     $self->set_graph_attribute( 'faces', \@faces );
     return bless $self;
 }
@@ -183,6 +184,8 @@ sub bifrustum
                             join( '', sort ( $F1[($_+1) % $N], $F2[($_+1) % $N] ) ) );
     }
 
+    $prism->set_graph_attribute( 'constructor', 'bifrustum' );
+
     return $prism;
 }
 
@@ -201,6 +204,7 @@ sub bipyramid
     my $pyramid = pyramid( $N );
     my( $base ) = $pyramid->faces;
     $pyramid->stellate( $base );
+    $pyramid->set_graph_attribute( 'constructor', 'bipyramid' );
     return $pyramid;
 }
 
@@ -252,7 +256,9 @@ sub cucurbituril
                Set::Scalar->new( @CAP2 ),
                @faces );
 
+    $self->set_graph_attribute( 'constructor', 'cucurbituril' );
     $self->set_graph_attribute( 'faces', \@faces );
+
     return bless $self;
 }
 
@@ -274,6 +280,7 @@ sub cupola
     while( @face ) {
         $prism->delete_edge( shift @face, shift @face );
     }
+    $prism->set_graph_attribute( 'constructor', 'cupola' );
     return $prism;
 }
 
@@ -287,6 +294,7 @@ sub dodecahedron()
 {
     my $pt = trapezohedron( 5 );
     $pt->truncate( 'A', 'B' );
+    $pt->set_graph_attribute( 'constructor', 'dodecahedron' );
     return $pt;
 }
 
@@ -331,6 +339,8 @@ sub gyrobicupola
     while( @F2 ) {
         $bifrustum->delete_edge( shift @F2, shift @F2 );
     }
+
+    $bifrustum->set_graph_attribute( 'constructor', 'gyrobicupola' );
 
     return $bifrustum;
 }
@@ -409,6 +419,7 @@ sub orthobicupola
         $bifrustum->delete_edge( shift @F2, shift @F2 );
     }
 
+    $bifrustum->set_graph_attribute( 'constructor', 'orthobicupola' );
     return $bifrustum;
 }
 
@@ -441,7 +452,9 @@ sub prism
                                        $F2[($_+1) % $N] );
     }
 
+    $self->set_graph_attribute( 'constructor', 'prism' );
     $self->set_graph_attribute( 'faces', \@faces );
+
     return bless $self;
 }
 
@@ -473,7 +486,9 @@ sub pyramid
                                        $base[($_+1) % $N] );
     }
 
+    $self->set_graph_attribute( 'constructor', 'pyramid' );
     $self->set_graph_attribute( 'faces', \@faces );
+
     return bless $self;
 }
 
@@ -509,6 +524,7 @@ sub rotunda
         last;
     }
     $cupola->face_dualify( @$face );
+    $cupola->set_graph_attribute( 'constructor', 'rotunda' );
 
     return $cupola;
 }
@@ -536,7 +552,9 @@ sub tetrahedron()
         push @faces, Set::Scalar->new( grep { $_ ne $v1 } @vertices );
     }
 
+    $self->set_graph_attribute( 'constructor', 'pyramid' );
     $self->set_graph_attribute( 'faces', \@faces );
+
     return bless $self; # TODO: Bless with class?
 }
 
@@ -572,6 +590,7 @@ sub trapezohedron
                                        map { $equator[($i*2+$_) % ($N*2)] } 1..3 );
     }
 
+    $self->set_graph_attribute( 'constructor', 'trapezohedron' );
     $self->set_graph_attribute( 'faces', \@faces );
     return bless $self; # TODO: Bless with class?
 }
@@ -658,7 +677,9 @@ sub delete_edge
         push @faces, $_ if $_->size > 2; # Exclude collapsed faces
     }
 
+    $self->delete_graph_attribute( 'constructor' );
     $self->set_graph_attribute( 'faces', \@faces );
+
     return $self;
 }
 
@@ -696,7 +717,9 @@ sub delete_face
         $_->insert( $vertex );
     }
 
+    $self->delete_graph_attribute( 'constructor' );
     $self->set_graph_attribute( 'faces', \@faces );
+
     return $self;
 }
 
@@ -722,6 +745,7 @@ sub delete_vertex
     my $new_face = sum( @containing_faces );
     $new_face->delete( $vertex );
 
+    $self->delete_graph_attribute( 'constructor' );
     $self->set_graph_attribute( 'faces', [ @other_faces, $new_face ] );
 
     return $self;
@@ -747,6 +771,8 @@ sub carve_edge
         next unless $_->has( $edge[0] ) && $_->has( $edge[1] );
         $_->insert( $vertex );
     }
+
+    $self->delete_graph_attribute( 'constructor' );
 
     return $self;
 }
@@ -795,6 +821,8 @@ sub carve_face
     push @faces, Set::Scalar->new( @F1 ), Set::Scalar->new( @F2 );
     $self->set_graph_attribute( 'faces', \@faces );
 
+    $self->delete_graph_attribute( 'constructor' );
+
     return $self;
 }
 
@@ -822,6 +850,9 @@ sub face_dualify
     push @faces, Set::Scalar->new( @new_vertices );
 
     $self->set_graph_attribute( 'faces', \@faces );
+    $self->delete_graph_attribute( 'constructor' );
+
+    return $self;
 }
 
 =head2 C<rectify()>
@@ -854,6 +885,8 @@ sub rectify
         # Delete the vertex and merge adjacent faces
         $self->delete_vertex( $vertex );
     }
+
+    $self->delete_graph_attribute( 'constructor' );
 
     return $self;
 }
@@ -891,7 +924,10 @@ sub stellate
         }
     }
 
+    $self->delete_graph_attribute( 'constructor' );
     $self->set_graph_attribute( 'faces', \@faces_now );
+
+    return $self;
 }
 
 =head2 C<truncate( @vertices )>
@@ -936,6 +972,8 @@ sub truncate
         # Remove the vertex
         $self->SUPER::delete_vertex( $vertex );
     }
+
+    $self->delete_graph_attribute( 'constructor' );
 
     return $self;
 }
@@ -989,6 +1027,7 @@ sub dual
     }
 
     $dual->set_graph_attribute( 'faces', \@dual_faces );
+    $self->delete_graph_attribute( 'constructor' );
 
     return bless $dual; # TODO: Bless with a class
 }
