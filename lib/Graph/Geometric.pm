@@ -842,7 +842,11 @@ sub _elongate
         my $N = max map { $self->degree( $_ ) } $self->vertices;
         $self = bifrustum( $N )->dual;
     } elsif( $constructor eq 'pyramid' ) {
-        my @face = $self->_largest_face;
+        # FIXME: Will fail with trigonal and square pyramids
+        my $N = max map { $self->degree( $_ ) } $self->vertices;
+        $self = prism( $N );
+        my( $face ) = grep { scalar( @$_ ) == $N } $self->faces;
+        $self->stellate( $face );
     } else {
         die "do not know how to elongate $constructor\n";
     }
