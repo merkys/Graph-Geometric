@@ -843,32 +843,39 @@ sub carve_face
 
 sub _elongate
 {
-    my( $self ) = @_;
+    my( $self, $cycle ) = @_;
 
-    if( !$self->has_graph_attribute( 'constructor' ) ) {
-        die "unknown geometric type for elongation\n";
-    }
-
-    my $constructor = $self->get_graph_attribute( 'constructor' );
-
-    if(      $constructor eq 'bipyramid' ) {
-        # FIXME: Will fail with trigonal and square bipyramids
-        # FIXME: Does not maintain vertex names - do we need this?
-        my $N = max map { $self->degree( $_ ) } $self->vertices;
-        $self = bifrustum( $N )->dual;
-    } elsif( $constructor eq 'pyramid' ) {
-        # FIXME: Will fail with trigonal and square pyramids
-        my $N = max map { $self->degree( $_ ) } $self->vertices;
-        $self = prism( $N );
-        my( $face ) = grep { scalar( @$_ ) == $N } $self->faces;
-        $self->stellate( $face );
+    if( $cycle && $self->has_face( $cycle ) ) {
+        # TODO: Elongate the given face
+    } elsif( $cycle ) {
+        # TODO: Elongate along the given cut
     } else {
-        die "do not know how to elongate $constructor\n";
+        # Elongate according to the type of geometric figure
+        if( !$self->has_graph_attribute( 'constructor' ) ) {
+            die "unknown geometric type for elongation\n";
+        }
+
+        my $constructor = $self->get_graph_attribute( 'constructor' );
+
+        if(      $constructor eq 'bipyramid' ) {
+            # FIXME: Will fail with trigonal and square bipyramids
+            # FIXME: Does not maintain vertex names - do we need this?
+            my $N = max map { $self->degree( $_ ) } $self->vertices;
+            $self = bifrustum( $N )->dual;
+        } elsif( $constructor eq 'pyramid' ) {
+            # FIXME: Will fail with trigonal and square pyramids
+            my $N = max map { $self->degree( $_ ) } $self->vertices;
+            $self = prism( $N );
+            my( $face ) = grep { scalar( @$_ ) == $N } $self->faces;
+            $self->stellate( $face );
+        } else {
+            die "do not know how to elongate $constructor\n";
+        }
+
+        $self->delete_graph_attribute( 'constructor' );
+
+        return $self;
     }
-
-    $self->delete_graph_attribute( 'constructor' );
-
-    return $self;
 }
 
 sub face_dualify
