@@ -52,7 +52,7 @@ push @subs, 'triangular', 'square';
 
 our @EXPORT = @subs;
 
-use List::Util qw( all any max sum );
+use List::Util qw( all any max sum uniq );
 use Set::Scalar;
 
 sub AUTOLOAD {
@@ -85,7 +85,7 @@ sub AUTOLOAD {
 
 =head1 DESCRIPTION
 
-C<Graph::Geometric> is an extension of C<Graph> to support working with geometric (topologic) graphs.
+C<Graph::Geometric> is an extension of L<Graph> to support working with geometric (topologic) graphs.
 In addition to vertices and edges, C<Graph::Geometric> has a concept of faces to ease handling of geometric graphs.
 C<Graph::Geometric> does not provide coordinates for vertices as it is supposed to be used for topology analysis of geometric shapes.
 
@@ -964,7 +964,7 @@ sub elongate
 
             my @cycle = grep { $triangular_faces{$_} == 2 } keys %triangular_faces;
             $self->elongate( \@cycle );
-        } else( $constructor eq 'gyrobirotunda' ||
+        } elsif( $constructor eq 'gyrobirotunda' ||
                 $constructor eq 'orthobirotunda' ) {
             # Birotundas should have two faces that are neither triangles nor pentagons.
             # FIXME: Will fail with trigonal and pentagonal birotundas.
