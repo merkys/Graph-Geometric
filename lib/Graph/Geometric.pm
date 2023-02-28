@@ -848,7 +848,9 @@ sub _elongate
     if( $cycle && $self->has_face( $cycle ) ) {
         # Elongate along the given face
         my @face = $self->_cycle_in_order( @$cycle );
-        $self->add_cycle( map { $_ . 'e' } @face ); # FIXME: Check if vertices are new
+        my @vertices = map { $_ . 'e' } @face;
+        $self->_ensure_vertices_do_not_exist( @vertices );
+        $self->add_cycle( @vertices );
 
         my @faces;
         for my $face (@{$self->get_graph_attribute( 'faces' )}) {
@@ -863,12 +865,12 @@ sub _elongate
                                            $face[($i+1) % @face],
                                            $face[($i+1) % @face] . 'e' );
         }
-        push @faces, Set::Scalar->new( map { $_ . 'e' } @face );
+        push @faces, Set::Scalar->new( @vertices );
 
         $self->set_graph_attribute( 'faces', \@faces );
     } elsif( $cycle ) {
         # TODO: Elongate along the given cut
-        if( !$self->has_cycle( @$cycle ) {
+        if( !$self->has_cycle( @$cycle ) ) {
             die "cannot elongate nonexisting cycle\n";
         }
 
