@@ -930,10 +930,9 @@ sub _elongate
         my $constructor = $self->get_graph_attribute( 'constructor' );
 
         if(      $constructor eq 'bipyramid' ) {
-            # FIXME: Will fail with trigonal and square bipyramids
-            # FIXME: Does not maintain vertex names - do we need this?
-            my $N = max map { $self->degree( $_ ) } $self->vertices;
-            $self = bifrustum( $N )->dual;
+            # FIXME: May be nondeterministic for square bipyramids
+            my @cycle = grep { $self->degree( $_ ) == 4 } $self->vertices;
+            $self->_elongate( \@cycle );
         } elsif( $constructor eq 'pyramid' ) {
             # FIXME: Will fail with trigonal and square pyramids
             my $N = max map { $self->degree( $_ ) } $self->vertices;
