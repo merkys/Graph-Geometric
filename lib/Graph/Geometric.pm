@@ -950,6 +950,20 @@ sub elongate
             # Elongate (extrude) the largest face
             my( $face ) = sort { scalar( @$b ) <=> scalar( @$a ) } $self->faces;
             $self->elongate( $face );
+        } elsif( $constructor eq 'gyrobicupola' ||
+                 $constructor eq 'orthobicupola' ) {
+            # Bicupolae are elongated along cycle where every vertex belongs to two triangular faces
+            my %triangular_faces;
+            for my $face ($self->faces) {
+                next unless scalar( @$face ) == 3;
+                for (@$face) {
+                    $triangular_faces{$_} = 0 unless $triangular_faces{$_};
+                    $triangular_faces{$_}++;
+                }
+            }
+
+            my @cycle = grep { $triangular_faces{$_} == 2 } keys %triangular_faces;
+            $self->elongate( \@cycle );
         } else {
             die "do not know how to elongate $constructor\n";
         }
