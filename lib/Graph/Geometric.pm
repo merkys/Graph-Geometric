@@ -934,11 +934,9 @@ sub _elongate
             my @cycle = grep { $self->degree( $_ ) == 4 } $self->vertices;
             $self->_elongate( \@cycle );
         } elsif( $constructor eq 'pyramid' ) {
-            # FIXME: Will fail with trigonal and square pyramids
             my $N = max map { $self->degree( $_ ) } $self->vertices;
-            $self = prism( $N );
             my( $face ) = grep { scalar( @$_ ) == $N } $self->faces;
-            $self->stellate( $face );
+            $self->_elongate( $face );
         } else {
             die "do not know how to elongate $constructor\n";
         }
