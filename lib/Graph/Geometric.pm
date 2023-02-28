@@ -883,7 +883,16 @@ sub _elongate
         my @vertices2 = map { $_ . '2' } @cycle; # FIXME: Check new vertices
 
         $self->add_cycle( @vertices1 );
-        $self->add_cycle( @vertices2 ); # FIXME: Interconnect vertices
+        $self->add_cycle( @vertices2 );
+
+        my @faces;
+        for (0..$#cycle) {
+            $self->add_edge( $vertices1[$_], $vertices2[$_] );
+            push @faces, Set::Scalar->new( $vertices1[$_],
+                                           $vertices2[$_],
+                                           $vertices1[($_+1) % @cycle]
+                                           $vertices2[($_+1) % @cycle] );
+        }
 
         for my $cycle_vertex (@cycle) {
             for my $neighbour ($self->neighbours( $cycle_vertex )) {
