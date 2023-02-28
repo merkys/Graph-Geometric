@@ -52,7 +52,7 @@ push @subs, 'triangular', 'square';
 
 our @EXPORT = @subs;
 
-use List::Util qw( all max sum );
+use List::Util qw( all any max sum );
 use Set::Scalar;
 
 sub AUTOLOAD {
@@ -846,7 +846,26 @@ sub _elongate
     my( $self, $cycle ) = @_;
 
     if( $cycle && $self->has_face( $cycle ) ) {
-        # TODO: Elongate the given face
+        # Elongate along the given face
+        my @face = $self->_cycle_in_order( @$cycle );
+        $self->add_cycle( map { $_ . 'e' } @face ); # FIXME: Check if vertices are new
+
+        my @faces;
+        for my $face (@{$self->get_graph_attribute( 'faces' )}) {
+            next if join( '', sort $face->members ) eq join( '', sort @face );
+            push @faces, $face;
+        }
+
+        for my $i (0..$#face) {
+            $self->add_edge( $face[$i], $face[$i] . 'e' );
+            push @faces, Set::Scalar->new( $face[$i],
+                                           $face[$i] . 'e',
+                                           $face[($i+1) % @face],
+                                           $face[($i+1) % @face] . 'e' );
+        }
+        push @faces, Set::Scalar->new( map { $_ . 'e' } @face );
+
+        $self->set_graph_attribute( 'faces', \@faces );
     } elsif( $cycle ) {
         # TODO: Elongate along the given cut
     } else {
@@ -871,11 +890,10 @@ sub _elongate
         } else {
             die "do not know how to elongate $constructor\n";
         }
-
-        $self->delete_graph_attribute( 'constructor' );
-
-        return $self;
     }
+
+    $self->delete_graph_attribute( 'constructor' );
+    return $self;
 }
 
 sub face_dualify
