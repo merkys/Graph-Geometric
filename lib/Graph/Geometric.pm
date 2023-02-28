@@ -1198,6 +1198,18 @@ They allow for such syntactically sweet calls like:
 
     my $truncated_icosahedron = truncated icosahedron;
 
+=head2 C<elongated()>
+
+Copies the given polyhedron, elongates it and returns the elongated polyhedron.
+This subroutine does not accept any parameters, thus if nonstandard elongation is wanted, other methods have to be used.
+
+=cut
+
+sub elongated($)
+{
+    return $_[0]->deep_copy->elongate;
+}
+
 =head2 C<rectified()>
 
 Copies the given polyhedron, rectifies it and returns the rectified polyhedron.
