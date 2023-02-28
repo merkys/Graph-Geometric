@@ -869,7 +869,7 @@ sub _elongate
 
         $self->set_graph_attribute( 'faces', \@faces );
     } elsif( $cycle ) {
-        # TODO: Elongate along the given cut
+        # Elongate along the given cut
         if( !$self->has_cycle( @$cycle ) ) {
             die "cannot elongate nonexisting cycle\n";
         }
@@ -885,13 +885,27 @@ sub _elongate
         $self->add_cycle( @vertices1 );
         $self->add_cycle( @vertices2 );
 
-        my @faces;
+        my $cycle_set = Set::Scalar->new( @cycle );
+        for my $face (@{$self->get_graph_attribute( 'faces' )}) {
+            my @vertices = ($face * $cycle_set)->elements;
+            next unless @vertices;
+
+            # The remaining vertices in a face will belong either to $C1 or $C2
+            my( $vertex ) = ($face - $cycle_set)->elements;
+            if( any { $_ eq $vertex } @$C1 ) {
+                $face->invert( @vertices, map { $_ . '1' } @vertices );
+            } else {
+                $face->invert( @vertices, map { $_ . '2' } @vertices );
+            }
+        }
+
+        my @new_faces;
         for (0..$#cycle) {
             $self->add_edge( $vertices1[$_], $vertices2[$_] );
-            push @faces, Set::Scalar->new( $vertices1[$_],
-                                           $vertices2[$_],
-                                           $vertices1[($_+1) % @cycle]
-                                           $vertices2[($_+1) % @cycle] );
+            push @new_faces, Set::Scalar->new( $vertices1[$_],
+                                               $vertices2[$_],
+                                               $vertices1[($_+1) % @cycle],
+                                               $vertices2[($_+1) % @cycle] );
         }
 
         for my $cycle_vertex (@cycle) {
@@ -905,7 +919,8 @@ sub _elongate
         }
 
         for (@cycle) { $self->SUPER::delete_vertex( $_ ) } # delete_vertices() does not work
-        # FIXME: Adjust faces
+        $self->set_graph_attribute( 'faces', [ @{$self->get_graph_attribute( 'faces' )},
+                                               @new_faces ] );
     } else {
         # Elongate according to the type of geometric figure
         if( !$self->has_graph_attribute( 'constructor' ) ) {
