@@ -841,7 +841,18 @@ sub carve_face
     return $self;
 }
 
-sub _elongate
+=head2 C<elongate( $cycle )>
+
+Elongate the given polyhedron.
+If given a face, elongates the polyhedron by extruding it.
+If given a non-face cycle, elongates the polyhedron by cutting accross the given cycle and inserting a prism in between.
+If not given anything, attempts to elongate according to the type of given polyhedron.
+I.e., pyramids are elongated by extruding their faces and so on.
+Subroutine dies if it encounters a polyhedron of a type unknown to it.
+
+=cut
+
+sub elongate
 {
     my( $self, $cycle ) = @_;
 
@@ -932,13 +943,13 @@ sub _elongate
         if(      $constructor eq 'bipyramid' ) {
             # FIXME: May be nondeterministic for square bipyramids
             my @cycle = grep { $self->degree( $_ ) == 4 } $self->vertices;
-            $self->_elongate( \@cycle );
+            $self->elongate( \@cycle );
         } elsif( $constructor eq 'cupola' ||
                  $constructor eq 'pyramid' ||
                  $constructor eq 'rotunda' ) {
             # Elongate (extrude) the largest face
             my( $face ) = sort { scalar( @$b ) <=> scalar( @$a ) } $self->faces;
-            $self->_elongate( $face );
+            $self->elongate( $face );
         } else {
             die "do not know how to elongate $constructor\n";
         }
