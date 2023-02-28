@@ -964,6 +964,16 @@ sub elongate
 
             my @cycle = grep { $triangular_faces{$_} == 2 } keys %triangular_faces;
             $self->elongate( \@cycle );
+        } else( $constructor eq 'gyrobirotunda' ||
+                $constructor eq 'orthobirotunda' ) {
+            # Birotundas should have two faces that are neither triangles nor pentagons.
+            # FIXME: Will fail with trigonal and pentagonal birotundas.
+            my @bases = grep { scalar( @$_ ) != 3 && scalar( @$_ ) != 5 }
+                             $self->faces;
+            my @removed = uniq @bases, map { $self->neighbours( $_ ) } @bases;
+            my $copy = $self->copy;
+            for (@removed) { $copy->SUPER::delete_vertex( $_ ) }
+            $self->elongate( [ $copy->vertices ] );
         } else {
             die "do not know how to elongate $constructor\n";
         }
