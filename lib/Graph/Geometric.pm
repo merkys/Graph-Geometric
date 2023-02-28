@@ -933,9 +933,11 @@ sub _elongate
             # FIXME: May be nondeterministic for square bipyramids
             my @cycle = grep { $self->degree( $_ ) == 4 } $self->vertices;
             $self->_elongate( \@cycle );
-        } elsif( $constructor eq 'pyramid' ) {
-            my $N = max map { $self->degree( $_ ) } $self->vertices;
-            my( $face ) = grep { scalar( @$_ ) == $N } $self->faces;
+        } elsif( $constructor eq 'cupola' ||
+                 $constructor eq 'pyramid' ||
+                 $constructor eq 'rotunda' ) {
+            # Elongate (extrude) the largest face
+            my( $face ) = sort { scalar( @$b ) <=> scalar( @$a ) } $self->faces;
             $self->_elongate( $face );
         } else {
             die "do not know how to elongate $constructor\n";
