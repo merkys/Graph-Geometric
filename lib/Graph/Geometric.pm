@@ -875,6 +875,28 @@ sub _elongate
         }
 
         my @cycle = $self->_cycle_in_order( @$cycle );
+        my $copy = $self->copy;
+        for (@cycle) { $copy->SUPER::delete_vertex( $_ ) } # delete_vertices() does not work
+        my( $C1, $C2 ) = $copy->connected_components; # FIXME: Establish deterministic order
+
+        my @vertices1 = map { $_ . '1' } @cycle;
+        my @vertices2 = map { $_ . '2' } @cycle; # FIXME: Check new vertices
+
+        $self->add_cycle( @vertices1 );
+        $self->add_cycle( @vertices2 ); # FIXME: Interconnect vertices
+
+        for my $cycle_vertex (@cycle) {
+            for my $neighbour ($self->neighbours( $cycle_vertex )) {
+                if(      any { $_ eq $neighbour } @$C1 ) {
+                    $self->add_edge( $neighbour, $cycle_vertex . '1' );
+                } elsif( any { $_ eq $neighbour } @$C2 ) {
+                    $self->add_edge( $neighbour, $cycle_vertex . '2' );
+                }
+            }
+        }
+
+        for (@cycle) { $self->SUPER::delete_vertex( $_ ) } # delete_vertices() does not work
+        # FIXME: Adjust faces
     } else {
         # Elongate according to the type of geometric figure
         if( !$self->has_graph_attribute( 'constructor' ) ) {

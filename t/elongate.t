@@ -21,3 +21,7 @@ $prism5->_elongate( $face5 );
 is scalar( $prism5->vertices ), scalar( $bifrustum5->vertices );
 is scalar( $prism5->edges ),    scalar( $bifrustum5->edges );
 is scalar( $prism5->faces ),    scalar( $bifrustum5->faces );
+
+my $bifrustum6 = hexagonal bifrustum;
+my @cycle = grep { $bifrustum6->degree( $_ ) == 4 } $bifrustum6->vertices;
+$bifrustum6->_elongate( \@cycle );
