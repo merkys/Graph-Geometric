@@ -868,6 +868,11 @@ sub _elongate
         $self->set_graph_attribute( 'faces', \@faces );
     } elsif( $cycle ) {
         # TODO: Elongate along the given cut
+        if( !$self->has_cycle( @$cycle ) {
+            die "cannot elongate nonexisting cycle\n";
+        }
+
+        my @cycle = $self->_cycle_in_order( @$cycle );
     } else {
         # Elongate according to the type of geometric figure
         if( !$self->has_graph_attribute( 'constructor' ) ) {
