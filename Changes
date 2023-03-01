@@ -1,4 +1,4 @@
-0.2.0 unreleased
+0.2.0 2023-03-01
 
     - Implement generators for bifrustum, gyrobicupola.
     - Implement property checkers is_isogonal(), is_isohedral(), is_isotoxal(), is_regular() and is_quasiregular().
