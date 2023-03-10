@@ -9,7 +9,9 @@ use Test::More;
 
 my @cases = (
     [ [ 'ABCD' ], 'ABCD' ],
-    # [ [ 'ABCD', 'ABEF' ], 'ABCD' ], # Will not work - generated cycle has a chord
+    [ [ 'ABCD', 'ABEF' ], 'ADCBFE' ],
+    [ [ 'ABCD', 'ABEF', 'BCFG' ], 'ADCGFE' ],
+    # [ [ 'ABCD', 'ABEF', 'BCFG', 'CDGH' ], 'ADCGFE' ], # FIXME: Does not work
 );
 
 plan tests => scalar @cases;
