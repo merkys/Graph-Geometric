@@ -1340,7 +1340,7 @@ sub _face_perimeter
         push @vertices, $vertex;
     }
 
-    # FIXME: This will not work if there are "short-cuts" in the cycle
+    # FIXME: This will not work if there are chords in the cycle
     return $self->_cycle_in_order( @vertices );
 }
 
@@ -1348,6 +1348,10 @@ sub _cycle_in_order
 {
     my( $graph, @face ) = @_;
     my $subgraph = $graph->subgraph( \@face );
+    if( any { $subgraph->degree( $_ ) != 2 } $subgraph->vertices ) {
+        die "given vertices do not form a chordless cycle\n";
+    }
+
     my @order;
     my( $current ) = sort $subgraph->vertices;
     while( $subgraph->vertices ) {

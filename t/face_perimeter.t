@@ -9,7 +9,7 @@ use Test::More;
 
 my @cases = (
     [ [ 'ABCD' ], 'ABCD' ],
-    # [ [ 'ABCD', 'ABEF' ], 'ABCD' ], # Will not work - generated cycle has a short-cut
+    # [ [ 'ABCD', 'ABEF' ], 'ABCD' ], # Will not work - generated cycle has a chord
 );
 
 plan tests => scalar @cases;
