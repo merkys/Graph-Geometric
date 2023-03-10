@@ -1316,6 +1316,34 @@ sub is_quasiregular
            scalar( Graph::Nauty::orbits( $self->dual, sub { return '' } ) ) == 2;
 }
 
+# Return the perimeter (vertices) that would be cut if the given faces would be detached from the polyhedron.
+# Perimeter is formed by all vertices of the given faces, but "burried" vertices are removed.
+sub _face_perimeter
+{
+    my( $self, $faces ) = @_;
+
+    my $set_of_faces = Set::Scalar->new( map { join '', sort @$_ } @$faces );
+    my $set_of_vertices = Set::Scalar->new( map { @$_ } @$faces );
+
+    # Check if given faces touch
+    my $dual = $self->dual->subgraph( [ @$set_of_faces ] );
+    if( scalar $dual->connected_components > 1 ) {
+        die "some of the given faces do not touch\n";
+    }
+
+    # "Burried" vertices participate only in the given faces
+    my @vertices;
+    for my $vertex (@$set_of_vertices) {
+        next if all  { $set_of_faces->has( join '', sort @$_ ) }
+                grep { $_->has( $vertex ) }
+                     @{$self->get_graph_attribute( 'faces' )};
+        push @vertices, $vertex;
+    }
+
+    # FIXME: This will not work if there are "short-cuts" in the cycle
+    return $self->_cycle_in_order( @vertices );
+}
+
 sub _cycle_in_order
 {
     my( $graph, @face ) = @_;
