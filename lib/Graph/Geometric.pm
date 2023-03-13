@@ -1350,6 +1350,10 @@ sub _face_perimeter
         $face_graph->SUPER::delete_edge( @$edge );
     }
 
+    if( scalar $face_graph->connected_components > 1 ) {
+        die "given faces form more than one opening\n";
+    }
+
     return $face_graph->_cycle_in_order( $face_graph->vertices );
 }
 
