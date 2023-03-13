@@ -12,6 +12,8 @@ my @cases = (
     [ [ 'ABCD', 'ABEF' ], 'ADCBFE' ],
     [ [ 'ABCD', 'ABEF', 'BCFG' ], 'ADCGFE' ],
     [ [ 'ABCD', 'ABEF', 'BCFG', 'CDGH' ], 'ADHGFE' ],
+    [ [ 'ABCD', 'ABEF', 'BCFG', 'CDGH', 'EFGH' ], 'ADHE' ],
+    [ [ 'ABCD', 'ABEF', 'BCFG', 'CDGH', 'EFGH', 'ADHE'], '' ],
 );
 
 plan tests => scalar @cases;
