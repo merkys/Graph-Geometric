@@ -11,7 +11,7 @@ my @cases = (
     [ [ 'ABCD' ], 'ABCD' ],
     [ [ 'ABCD', 'ABEF' ], 'ADCBFE' ],
     [ [ 'ABCD', 'ABEF', 'BCFG' ], 'ADCGFE' ],
-    # [ [ 'ABCD', 'ABEF', 'BCFG', 'CDGH' ], 'ADCGFE' ], # FIXME: Does not work
+    [ [ 'ABCD', 'ABEF', 'BCFG', 'CDGH' ], 'ADHGFE' ],
 );
 
 plan tests => scalar @cases;

@@ -1330,23 +1330,27 @@ sub _face_perimeter
         die "some of the given faces do not touch\n";
     }
 
-    my $subgraph = $self->subgraph( [ map { @$_ } @$faces ] );
+    my $face_graph = Graph::Undirected->new;
+    for my $face (@$faces) {
+        $face_graph->add_cycle( $self->_cycle_in_order( @$face ) );
+    }
+    bless $face_graph;
 
     # Remove "buried" vertices which participate only in the given faces
-    for my $vertex ($subgraph->vertices) {
+    for my $vertex ($face_graph->vertices) {
         next if any { !$set_of_faces->has( join '', sort @$_ ) }
                     $self->faces( $vertex );
-        $subgraph->SUPER::delete_vertex( $vertex );
+        $face_graph->SUPER::delete_vertex( $vertex );
     }
 
     # Remove "buried" edges which participate only in the given faces
-    for my $edge ($subgraph->edges) {
+    for my $edge ($face_graph->edges) {
         next if any { !$set_of_faces->has( join '', sort @$_ ) }
                     $self->faces( @$edge );
-        $subgraph->SUPER::delete_edge( @$edge );
+        $face_graph->SUPER::delete_edge( @$edge );
     }
 
-    return $subgraph->_cycle_in_order( $subgraph->vertices );
+    return $face_graph->_cycle_in_order( $face_graph->vertices );
 }
 
 sub _cycle_in_order
