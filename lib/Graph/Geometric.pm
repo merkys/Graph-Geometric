@@ -965,7 +965,7 @@ sub elongate
             my @cycle = grep { $triangular_faces{$_} == 2 } keys %triangular_faces;
             $self->elongate( \@cycle );
         } elsif( $constructor eq 'gyrobirotunda' ||
-                $constructor eq 'orthobirotunda' ) {
+                 $constructor eq 'orthobirotunda' ) {
             # Birotundas should have two faces that are neither triangles nor pentagons.
             # FIXME: Will fail with trigonal and pentagonal birotundas.
             my @bases = grep { scalar( @$_ ) != 3 && scalar( @$_ ) != 5 }
@@ -1256,7 +1256,7 @@ sub is_isogonal
 {
     my( $self ) = @_;
     require Graph::Nauty;
-    return scalar( Graph::Nauty::orbits( $self, sub { return '' } ) ) == 1;
+    return scalar( Graph::Nauty::orbits( $self, sub { '' } ) ) == 1;
 }
 
 =head2 C<is_isotoxal()>
@@ -1313,7 +1313,7 @@ sub is_quasiregular
 {
     my( $self ) = @_;
     return $self->is_isogonal && $self->is_isotoxal &&
-           scalar( Graph::Nauty::orbits( $self->dual, sub { return '' } ) ) == 2;
+           scalar( Graph::Nauty::orbits( $self->dual, sub { '' } ) ) == 2;
 }
 
 =head2 C<Euler_characteristic()>
