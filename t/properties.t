@@ -16,7 +16,7 @@ my @cases = (
     [  1,  1, '', '',  1, rectified octahedron ],
 );
 
-plan tests => 5 * scalar @cases;
+plan tests => 6 * scalar @cases;
 
 for my $case (@cases) {
     my( $is_isogonal, $is_isotoxal, $is_isohedral, $is_regular, $is_quasiregular, $figure ) = @$case;
@@ -25,4 +25,5 @@ for my $case (@cases) {
     is $figure->is_isohedral,    $is_isohedral;
     is $figure->is_regular,      $is_regular;
     is $figure->is_quasiregular, $is_quasiregular;
+    is $figure->Euler_characteristic, 2;
 }
