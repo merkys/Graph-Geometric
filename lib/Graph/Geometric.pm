@@ -1316,6 +1316,18 @@ sub is_quasiregular
            scalar( Graph::Nauty::orbits( $self->dual, sub { return '' } ) ) == 2;
 }
 
+=head2 C<Euler_characteristic()>
+
+Returns Euler characteristic (V - E + F).
+
+=cut
+
+sub Euler_characteristic
+{
+    my( $self ) = @_;
+    return $self->vertices - $self->edges + $self->faces;
+}
+
 # Return the perimeter (vertices) that would be cut if the given faces would be detached from the polyhedron.
 # Perimeter is formed by all vertices of the given faces, but "buried" vertices are removed.
 sub _face_perimeter
