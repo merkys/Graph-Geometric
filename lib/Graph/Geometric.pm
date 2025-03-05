@@ -44,6 +44,7 @@ my @subs = qw(
     rhombic_dodecahedron
     rotunda
     stellated
+    torus
     trapezohedron
     truncated
 );
@@ -553,6 +554,39 @@ sub tetrahedron()
     }
 
     $self->set_graph_attribute( 'constructor', 'pyramid' );
+    $self->set_graph_attribute( 'faces', \@faces );
+
+    return bless $self; # TODO: Bless with class?
+}
+
+=head2 C<torus( $S, $C )>
+
+Creates a toroidal polyhedron with S sections and C nodes in each cross-section.
+
+=cut
+
+sub torus
+{
+    my( $S, $C ) = @_;
+
+    my @vertices = _names( $S * $C );
+
+    my $self = Graph::Undirected->new;
+
+    my @faces;
+    for my $s (0..$S-1) {
+        for my $c (0..$C-1) {
+            my @face = map { $vertices[$_ % @vertices] }
+                           (  $s * $C + $c,
+                              $s * $C + $c + 1,
+                             ($s + 1) * $C + $c + 1,
+                             ($s + 1) * $C + $c );
+            $self->add_cycle( @face );
+            push @faces, Set::Scalar->new( @face );
+        }
+    }
+
+    $self->set_graph_attribute( 'constructor', 'torus' );
     $self->set_graph_attribute( 'faces', \@faces );
 
     return bless $self; # TODO: Bless with class?
